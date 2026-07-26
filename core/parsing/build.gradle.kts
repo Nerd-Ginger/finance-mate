@@ -1,4 +1,4 @@
-plugins {
+﻿plugins {
     alias(libs.plugins.kotlin.jvm)
 }
 
@@ -13,8 +13,10 @@ dependencies {
     testImplementation(libs.junit)
     testImplementation(libs.kotest.assertions)
     testImplementation(libs.kotest.property)
+    testImplementation(libs.kotlinx.coroutines.core)
 }
 
 tasks.test {
     useJUnit()
 }
+
