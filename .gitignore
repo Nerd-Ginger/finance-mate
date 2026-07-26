@@ -1,0 +1,48 @@
+# Gradle
+.gradle/
+build/
+!gradle/wrapper/gradle-wrapper.jar
+!gradle/wrapper/gradle-wrapper.properties
+
+# Android
+local.properties
+*.apk
+*.aab
+*.ap_
+*.dex
+release/
+captures/
+.externalNativeBuild/
+.cxx/
+
+# IDE
+.idea/
+*.iml
+.kotlin/
+out/
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Secrets — never commit an API key.
+# FinanceMate stores the Anthropic key in the Android Keystore at runtime;
+# nothing key-shaped should ever reach the repo.
+*.jks
+*.keystore
+keystore.properties
+secrets.properties
+**/anthropic.key
+
+# User financial data — belt and braces. Nothing from a real statement
+# should be committed. Synthetic fixtures under src/test/resources are
+# re-included below; anything else statement-shaped stays out.
+*.ofx
+*.qfx
+*.qif
+*.csv
+sample-statements/
+scratch/
+
+!**/src/test/resources/**
+!**/src/androidTest/assets/**

@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+    FinanceMate opts out of cloud backup and device-to-device transfer entirely.
+
+    The ledger is an encrypted SQLCipher database whose key is sealed in the
+    hardware Keystore, and Keystore material is non-exportable by design. Allowing
+    the framework to copy the database off the device would produce a backup that
+    is useless at best (unopenable without the key) and a liability at worst.
+    Users move their data via the app's own explicit encrypted export instead,
+    where they control the passphrase.
+-->
+<data-extraction-rules>
+    <cloud-backup>
+        <exclude domain="root" />
+        <exclude domain="database" />
+        <exclude domain="sharedpref" />
+        <exclude domain="file" />
+        <exclude domain="external" />
+    </cloud-backup>
+    <device-transfer>
+        <exclude domain="root" />
+        <exclude domain="database" />
+        <exclude domain="sharedpref" />
+        <exclude domain="file" />
+        <exclude domain="external" />
+    </device-transfer>
+</data-extraction-rules>

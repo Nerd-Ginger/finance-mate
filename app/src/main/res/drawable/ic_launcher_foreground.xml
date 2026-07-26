@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Placeholder mark: a shield (privacy) enclosing a rising bar chart (budgeting). -->
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="108dp"
+    android:height="108dp"
+    android:viewportWidth="108"
+    android:viewportHeight="108">
+
+    <path
+        android:fillColor="#FFFFFF"
+        android:pathData="M54,28L74,35.5V52C74,64.5 65.5,74.5 54,78C42.5,74.5 34,64.5 34,52V35.5L54,28Z" />
+
+    <path
+        android:fillColor="#1B5E20"
+        android:pathData="M44,60h5v9h-5z" />
+    <path
+        android:fillColor="#1B5E20"
+        android:pathData="M51.5,53h5v16h-5z" />
+    <path
+        android:fillColor="#1B5E20"
+        android:pathData="M59,45h5v24h-5z" />
+
+</vector>

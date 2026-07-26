@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!--
+        Colours and typography are supplied by Material 3 in Compose. This theme
+        exists only to give the Activity a sane starting window before Compose
+        takes over, so it deliberately carries no colour definitions.
+    -->
+    <style name="Theme.FinanceMate" parent="android:Theme.Material.NoActionBar">
+        <item name="android:statusBarColor">@android:color/transparent</item>
+        <item name="android:navigationBarColor">@android:color/transparent</item>
+    </style>
+</resources>

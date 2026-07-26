@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="utf-8"?>
+<manifest xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <!--
+        INTERNET is the app's only outbound capability, and it exists solely so the
+        opt-in AI features in :ai can reach api.anthropic.com. Statement parsing,
+        OCR, categorisation, and every analysis in :feature:insight run fully
+        offline and never need it.
+
+        If you are reviewing this app's privacy claims, this permission plus the
+        :ai module is the complete surface you need to audit.
+    -->
+    <uses-permission android:name="android.permission.INTERNET" />
+
+    <!-- Biometric prompt guarding the encrypted vault and the stored API key. -->
+    <uses-permission android:name="android.permission.USE_BIOMETRIC" />
+
+    <application
+        android:name=".FinanceMateApplication"
+        android:allowBackup="false"
+        android:dataExtractionRules="@xml/data_extraction_rules"
+        android:fullBackupContent="false"
+        android:icon="@mipmap/ic_launcher"
+        android:label="@string/app_name"
+        android:roundIcon="@mipmap/ic_launcher_round"
+        android:supportsRtl="true"
+        android:theme="@style/Theme.FinanceMate">
+
+        <activity
+            android:name=".MainActivity"
+            android:exported="true"
+            android:label="@string/app_name"
+            android:theme="@style/Theme.FinanceMate"
+            android:windowSoftInputMode="adjustResize">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity>
+
+    </application>
+
+</manifest>
