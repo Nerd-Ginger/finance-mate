@@ -104,16 +104,22 @@ the Gradle wrapper.
 
 ### If your checkout is on a network drive
 
-SMB holds file handles long enough that Gradle intermittently fails to clear its
-own outputs. Add this to `local.properties` (gitignored) to put build output on
-local disk — it also makes builds several times faster:
+SMB holds file handles long enough that Gradle can intermittently fail to clear
+its own outputs. `gradle.properties` disables VFS watching and runs the Kotlin
+compiler in-process, which addresses this; both settings are safe to remove on a
+local disk.
+
+If you still see `Unable to delete directory`, build output can be relocated via
+`local.properties` (gitignored):
 
 ```properties
-financemate.buildDir=C:/FinanceMateBuild
+financemate.buildDir=D:/FinanceMateBuild
 ```
 
-`gradle.properties` also disables VFS watching and runs the Kotlin compiler
-in-process for the same reason. Both are safe to remove on a local disk.
+**On Windows the target must be on the same drive as the checkout.** Room's KSP
+processor relativises generated-source paths against the project directory, and
+Java cannot express a relative path across drive roots — a `Z:` checkout with a
+`C:` build directory fails with *"this and base files have different roots"*.
 
 ---
 

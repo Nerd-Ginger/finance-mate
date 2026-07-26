@@ -1,4 +1,4 @@
-﻿package dev.financemate.core.parsing
+package dev.financemate.core.parsing
 
 import dev.financemate.core.model.AccountId
 import dev.financemate.core.model.ParsedTransaction

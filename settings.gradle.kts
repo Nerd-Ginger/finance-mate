@@ -31,8 +31,14 @@ rootProject.name = "FinanceMate"
 // problem outright and is considerably faster besides.
 //
 // Opt in per machine by adding to local.properties (which is gitignored):
-//     financemate.buildDir=C:/FinanceMateBuild
+//     financemate.buildDir=D:/FinanceMateBuild
 // Leave it unset and the build behaves exactly as normal.
+//
+// ⚠️ On Windows the target MUST be on the same drive as the checkout. Room's
+// KSP processor relativises generated-source paths against the project
+// directory, and Java cannot express a relative path between two drive roots —
+// so a Z: checkout with a C: build directory fails with
+// "this and base files have different roots". Same-drive relocation is fine.
 // ---------------------------------------------------------------------------
 val localProperties = java.util.Properties().apply {
     val file = rootDir.resolve("local.properties")
