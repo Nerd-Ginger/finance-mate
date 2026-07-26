@@ -37,6 +37,10 @@ dependencies {
     // both of which live in the pure-JVM parsing module.
     api(project(":core:parsing"))
     api(project(":core:crypto"))
+    // :feature:insight is a pure-JVM computation library with no dependencies of
+    // its own — the same shape as :core:money — so depending on it here creates
+    // no cycle and keeps the analysis itself free of Android.
+    api(project(":feature:insight"))
 
     implementation(libs.androidx.core.ktx)
     implementation(libs.kotlinx.coroutines.android)

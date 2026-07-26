@@ -104,22 +104,33 @@ the Gradle wrapper.
 
 ### If your checkout is on a network drive
 
-SMB holds file handles long enough that Gradle can intermittently fail to clear
-its own outputs. `gradle.properties` disables VFS watching and runs the Kotlin
-compiler in-process, which addresses this; both settings are safe to remove on a
-local disk.
+### If builds fail with "Unable to delete directory"
 
-If you still see `Unable to delete directory`, build output can be relocated via
+Gradle intermittently cannot clear its own intermediates, sometimes across every
+module at once. The cause is another process holding handles on files Gradle has
+just written — on Windows that is typically real-time antivirus scanning or
+search indexing, both of which open files immediately after creation.
+
+Two mitigations are already in the repo: `gradle.properties` disables VFS
+watching, runs the Kotlin compiler in-process, and turns off parallel execution,
+which together reduce the number of processes and concurrent writers involved.
+
+If it still happens, move build output out of the source tree via
 `local.properties` (gitignored):
 
 ```properties
-financemate.buildDir=D:/FinanceMateBuild
+financemate.buildDir=Z:/FinanceMateBuild
 ```
 
-**On Windows the target must be on the same drive as the checkout.** Room's KSP
-processor relativises generated-source paths against the project directory, and
-Java cannot express a relative path across drive roots — a `Z:` checkout with a
-`C:` build directory fails with *"this and base files have different roots"*.
+**The target must be on the same drive as the checkout.** Room's KSP processor
+relativises generated-source paths against the project directory, and Java
+cannot express a relative path across drive roots — a `Z:` checkout with a `C:`
+build directory fails with *"this and base files have different roots"*. Same
+drive, different folder, works and is noticeably faster.
+
+The real fix is excluding the project and Gradle home directories from real-time
+scanning. That is a machine-level decision, so it is left to whoever owns the
+machine rather than being worked around further here.
 
 ---
 

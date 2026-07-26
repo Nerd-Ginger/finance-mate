@@ -2,7 +2,7 @@
   "formatVersion": 1,
   "database": {
     "version": 1,
-    "identityHash": "7b6208e75a1b5b3f20abc631587ceb04",
+    "identityHash": "af8132ee42ec87ed24c42a4a2cf8494e",
     "entities": [
       {
         "tableName": "accounts",
@@ -130,7 +130,7 @@
       },
       {
         "tableName": "transactions",
-        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` TEXT NOT NULL, `accountId` TEXT NOT NULL, `postedDate` INTEGER NOT NULL, `amountMinorUnits` INTEGER NOT NULL, `currency` TEXT NOT NULL, `rawDescription` TEXT NOT NULL, `merchantKey` TEXT NOT NULL, `categoryId` TEXT, `dedupHash` TEXT NOT NULL, `importBatchId` TEXT, `institutionTransactionId` TEXT, `isPending` INTEGER NOT NULL, `isTransfer` INTEGER NOT NULL, `notes` TEXT, `tags` TEXT, PRIMARY KEY(`id`), FOREIGN KEY(`accountId`) REFERENCES `accounts`(`id`) ON UPDATE NO ACTION ON DELETE CASCADE , FOREIGN KEY(`categoryId`) REFERENCES `categories`(`id`) ON UPDATE NO ACTION ON DELETE SET NULL , FOREIGN KEY(`importBatchId`) REFERENCES `import_batches`(`id`) ON UPDATE NO ACTION ON DELETE SET NULL )",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` TEXT NOT NULL, `accountId` TEXT NOT NULL, `postedDate` INTEGER NOT NULL, `amountMinorUnits` INTEGER NOT NULL, `currency` TEXT NOT NULL, `rawDescription` TEXT NOT NULL, `merchantKey` TEXT NOT NULL, `categoryId` TEXT, `dedupHash` TEXT NOT NULL, `importBatchId` TEXT, `institutionTransactionId` TEXT, `isPending` INTEGER NOT NULL, `isTransfer` INTEGER NOT NULL, `notes` TEXT, `tags` TEXT, PRIMARY KEY(`id`), FOREIGN KEY(`accountId`) REFERENCES `accounts`(`id`) ON UPDATE NO ACTION ON DELETE CASCADE , FOREIGN KEY(`categoryId`) REFERENCES `categories`(`id`) ON UPDATE NO ACTION ON DELETE SET NULL , FOREIGN KEY(`importBatchId`) REFERENCES `import_batches`(`id`) ON UPDATE NO ACTION ON DELETE SET NULL DEFERRABLE INITIALLY DEFERRED)",
         "fields": [
           {
             "fieldPath": "id",
@@ -406,11 +406,45 @@
             ]
           }
         ]
+      },
+      {
+        "tableName": "merchant_classifications",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`merchantKey` TEXT NOT NULL, `serviceClass` TEXT, `displayNameOverride` TEXT, `updatedAtEpochMillis` INTEGER NOT NULL, PRIMARY KEY(`merchantKey`))",
+        "fields": [
+          {
+            "fieldPath": "merchantKey",
+            "columnName": "merchantKey",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "serviceClass",
+            "columnName": "serviceClass",
+            "affinity": "TEXT"
+          },
+          {
+            "fieldPath": "displayNameOverride",
+            "columnName": "displayNameOverride",
+            "affinity": "TEXT"
+          },
+          {
+            "fieldPath": "updatedAtEpochMillis",
+            "columnName": "updatedAtEpochMillis",
+            "affinity": "INTEGER",
+            "notNull": true
+          }
+        ],
+        "primaryKey": {
+          "autoGenerate": false,
+          "columnNames": [
+            "merchantKey"
+          ]
+        }
       }
     ],
     "setupQueries": [
       "CREATE TABLE IF NOT EXISTS room_master_table (id INTEGER PRIMARY KEY,identity_hash TEXT)",
-      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, '7b6208e75a1b5b3f20abc631587ceb04')"
+      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, 'af8132ee42ec87ed24c42a4a2cf8494e')"
     ]
   }
 }

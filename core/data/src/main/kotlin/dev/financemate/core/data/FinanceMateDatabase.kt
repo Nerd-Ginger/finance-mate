@@ -5,10 +5,12 @@ import androidx.room.RoomDatabase
 import dev.financemate.core.data.dao.AccountDao
 import dev.financemate.core.data.dao.CategoryDao
 import dev.financemate.core.data.dao.ImportBatchDao
+import dev.financemate.core.data.dao.MerchantClassificationDao
 import dev.financemate.core.data.dao.TransactionDao
 import dev.financemate.core.data.entity.AccountEntity
 import dev.financemate.core.data.entity.CategoryEntity
 import dev.financemate.core.data.entity.ImportBatchEntity
+import dev.financemate.core.data.entity.MerchantClassificationEntity
 import dev.financemate.core.data.entity.TransactionEntity
 
 /**
@@ -26,6 +28,7 @@ import dev.financemate.core.data.entity.TransactionEntity
         CategoryEntity::class,
         TransactionEntity::class,
         ImportBatchEntity::class,
+        MerchantClassificationEntity::class,
     ],
     version = 1,
     exportSchema = true,
@@ -39,6 +42,8 @@ public abstract class FinanceMateDatabase : RoomDatabase() {
     public abstract fun transactionDao(): TransactionDao
 
     public abstract fun importBatchDao(): ImportBatchDao
+
+    public abstract fun merchantClassificationDao(): MerchantClassificationDao
 
     public companion object {
         public const val NAME: String = "financemate.db"

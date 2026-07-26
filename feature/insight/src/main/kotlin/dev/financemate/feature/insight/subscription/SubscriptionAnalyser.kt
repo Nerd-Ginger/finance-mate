@@ -20,6 +20,12 @@ import kotlin.math.abs
  */
 public class SubscriptionAnalyser(
     /**
+     * Decides each merchant's service class. Defaults to the built-in catalogue;
+     * pass an [OverridingMerchantClassifier] to respect the user's own tagging.
+     */
+    private val classifier: MerchantClassifier = BuiltInClassifier,
+
+    /**
      * Smallest change treated as a real price rise, as a fraction.
      *
      * Below this, a change is more likely to be sales-tax drift or an FX
@@ -54,7 +60,7 @@ public class SubscriptionAnalyser(
 
     private fun RecurringSeries.toSubscription(asOf: LocalDate): Subscription = Subscription(
         merchantKey = merchantKey,
-        serviceClass = ServiceCatalogue.classify(merchantKey),
+        serviceClass = classifier.classify(merchantKey),
         cadence = cadence,
         currentAmount = typicalAmount.abs(),
         annualCost = annualisedCost.abs(),

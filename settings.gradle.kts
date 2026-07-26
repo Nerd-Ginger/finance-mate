@@ -25,20 +25,21 @@ rootProject.name = "FinanceMate"
 // ---------------------------------------------------------------------------
 // Optional build-output relocation.
 //
-// When the checkout lives on a mapped network drive, SMB holds file handles long
-// enough that Gradle intermittently fails with "Unable to delete directory" while
-// clearing its own outputs. Pointing build directories at local disk removes the
-// problem outright and is considerably faster besides.
+// Some machines intermittently fail with "Unable to delete directory" while
+// Gradle clears its own intermediates, because another process (typically
+// real-time antivirus or search indexing) still holds handles on files Gradle
+// just wrote. Moving build output out of the source tree avoids it, and is
+// faster besides.
 //
 // Opt in per machine by adding to local.properties (which is gitignored):
-//     financemate.buildDir=D:/FinanceMateBuild
+//     financemate.buildDir=Z:/FinanceMateBuild
 // Leave it unset and the build behaves exactly as normal.
 //
 // ⚠️ On Windows the target MUST be on the same drive as the checkout. Room's
 // KSP processor relativises generated-source paths against the project
 // directory, and Java cannot express a relative path between two drive roots —
 // so a Z: checkout with a C: build directory fails with
-// "this and base files have different roots". Same-drive relocation is fine.
+// "this and base files have different roots". Same drive, different folder.
 // ---------------------------------------------------------------------------
 val localProperties = java.util.Properties().apply {
     val file = rootDir.resolve("local.properties")

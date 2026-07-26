@@ -1,96 +1,119 @@
 package dev.financemate.ui
 
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.verticalScroll
-import androidx.compose.material3.Card
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Savings
+import androidx.compose.material.icons.filled.Upload
 import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Icon
+import androidx.compose.material3.NavigationBar
+import androidx.compose.material3.NavigationBarItem
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.tooling.preview.Preview
-import androidx.compose.ui.unit.dp
+import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import androidx.lifecycle.viewmodel.compose.viewModel
+import dev.financemate.AppContainer
+import dev.financemate.feature.insight.subscription.Subscription
+import dev.financemate.ui.import.ImportScreen
+import dev.financemate.ui.import.ImportUiState
+import dev.financemate.ui.import.ImportViewModel
+import dev.financemate.ui.savings.MerchantTagSheet
+import dev.financemate.ui.savings.SavingsScreen
+import dev.financemate.ui.savings.SavingsViewModel
 import dev.financemate.ui.theme.FinanceMateTheme
 
+private enum class Destination(val label: String, val icon: ImageVector) {
+    SAVINGS("Savings", Icons.Filled.Savings),
+    IMPORT("Import", Icons.Filled.Upload),
+}
+
 @Composable
-fun FinanceMateApp() {
+public fun FinanceMateApp(container: AppContainer) {
     FinanceMateTheme {
-        HomeScaffold()
+        AppScaffold(container)
     }
 }
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-private fun HomeScaffold() {
+private fun AppScaffold(container: AppContainer) {
+    var destination by remember { mutableStateOf(Destination.SAVINGS) }
+    var taggingSubscription by remember { mutableStateOf<Subscription?>(null) }
+
+    val savingsViewModel: SavingsViewModel = viewModel { SavingsViewModel(container) }
+    val importViewModel: ImportViewModel = viewModel { ImportViewModel(container) }
+
+    val savingsState by savingsViewModel.state.collectAsStateWithLifecycle()
+    val importState by importViewModel.state.collectAsStateWithLifecycle()
+
     Scaffold(
-        topBar = { TopAppBar(title = { Text("FinanceMate") }) },
-    ) { innerPadding ->
-        Column(
-            modifier = Modifier
-                .fillMaxSize()
-                .verticalScroll(rememberScrollState())
-                .padding(innerPadding)
-                .padding(16.dp),
-            verticalArrangement = Arrangement.spacedBy(12.dp),
-        ) {
-            Text(
-                text = "Set-up in progress",
-                style = MaterialTheme.typography.headlineSmall,
-            )
-            StatusCard(
-                title = "On-device by default",
-                body = "Statement parsing, categorisation, and every savings " +
-                    "analysis run locally. Nothing leaves this device unless you " +
-                    "explicitly turn on an AI feature.",
-            )
-            StatusCard(
-                title = "Next up",
-                body = "Import pipeline, budgeting, then the savings engine that " +
-                    "finds duplicate subscriptions, price rises, and avoidable fees.",
-            )
-            StatusCard(
-                title = if (AiStatus.isConfigured) "AI enabled" else "AI off",
-                body = buildString {
-                    append(
-                        if (AiStatus.isConfigured) {
-                            "Requests use your own API key. "
-                        } else {
-                            "Add your own Anthropic API key to switch on the " +
-                                "optional AI features. Nothing is sent until you do. "
+        topBar = {
+            TopAppBar(
+                title = {
+                    Text(
+                        when (destination) {
+                            Destination.SAVINGS -> "Savings"
+                            Destination.IMPORT -> "Import a statement"
                         },
-                    )
-                    append("Model: ${AiStatus.selectedModel.displayName} ")
-                    append(
-                        "($${AiStatus.selectedModel.inputPricePerMTokUsd} in / " +
-                            "$${AiStatus.selectedModel.outputPricePerMTokUsd} out per million tokens).",
                     )
                 },
             )
+        },
+        bottomBar = {
+            NavigationBar {
+                Destination.entries.forEach { entry ->
+                    NavigationBarItem(
+                        selected = destination == entry,
+                        onClick = { destination = entry },
+                        icon = { Icon(entry.icon, contentDescription = null) },
+                        label = { Text(entry.label) },
+                    )
+                }
+            }
+        },
+    ) { innerPadding ->
+        when (destination) {
+            Destination.SAVINGS -> SavingsScreen(
+                state = savingsState,
+                onTagMerchant = { taggingSubscription = it },
+                modifier = Modifier.padding(innerPadding),
+            )
+
+            Destination.IMPORT -> ImportScreen(
+                state = importState,
+                onFilePicked = { uri -> importViewModel.onFilePicked(container.appContext, uri) },
+                onConfirm = { preview -> importViewModel.confirm(preview) },
+                onReset = {
+                    importViewModel.reset()
+                    // Re-analyse after an import so the savings figures reflect
+                    // what was just added rather than showing stale numbers.
+                    savingsViewModel.refresh()
+                },
+                modifier = Modifier.padding(innerPadding),
+            )
         }
     }
-}
 
-@Composable
-private fun StatusCard(title: String, body: String) {
-    Card {
-        Column(
-            modifier = Modifier.padding(16.dp),
-            verticalArrangement = Arrangement.spacedBy(6.dp),
-        ) {
-            Text(text = title, style = MaterialTheme.typography.titleMedium)
-            Text(text = body, style = MaterialTheme.typography.bodyMedium)
-        }
+    taggingSubscription?.let { subscription ->
+        MerchantTagSheet(
+            subscription = subscription,
+            onSelect = { serviceClass ->
+                savingsViewModel.tagMerchant(subscription.merchantKey, serviceClass)
+                taggingSubscription = null
+            },
+            onClearTag = {
+                savingsViewModel.clearTag(subscription.merchantKey)
+                taggingSubscription = null
+            },
+            onDismiss = { taggingSubscription = null },
+        )
     }
-}
-
-@Preview(showBackground = true)
-@Composable
-private fun HomePreview() {
-    FinanceMateTheme(dynamicColor = false) { HomeScaffold() }
 }

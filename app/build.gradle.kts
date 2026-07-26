@@ -45,7 +45,7 @@ android {
             excludes += "/META-INF/INDEX.LIST"
 
             // PdfBox-Android bundles BouncyCastle so password-protected bank
-            // statements can be opened — that part we need. What we do not need
+            // statements can be opened â€” that part we need. What we do not need
             // is BouncyCastle's post-quantum suite, whose lookup tables alone
             // (picnic/lowmc, SIKE, Frodo, McEliece) add ~3 MB of resources for
             // algorithms no PDF has ever been encrypted with.
@@ -77,6 +77,8 @@ dependencies {
     implementation(libs.androidx.lifecycle.runtime.ktx)
     implementation(libs.androidx.activity.compose)
     implementation(libs.androidx.navigation.compose)
+    implementation(libs.androidx.lifecycle.viewmodel.compose)
+    implementation(libs.androidx.lifecycle.runtime.compose)
     implementation(libs.kotlinx.coroutines.android)
 
     implementation(platform(libs.compose.bom))

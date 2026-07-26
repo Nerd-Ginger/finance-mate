@@ -10,6 +10,7 @@ class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         enableEdgeToEdge()
         super.onCreate(savedInstanceState)
-        setContent { FinanceMateApp() }
+        val container = (application as FinanceMateApplication).container
+        setContent { FinanceMateApp(container) }
     }
 }
