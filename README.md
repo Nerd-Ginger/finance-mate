@@ -147,10 +147,29 @@ machine rather than being worked around further here.
 
 ## Status
 
-Phase 0 complete: project scaffolded, toolchain verified end to end, `Money`
-implemented and property-tested, and the Anthropic-SDK-on-Android risk closed
-(see [ADR 0001](docs/adr/0001-anthropic-sdk-on-android.md) — it found a
-release-only failure that is invisible in debug builds).
+**Working end to end, in code: import a statement → see what recurs → see what
+you could save.** 208 tests.
 
-Next: the data model and import pipeline, then budgeting, then the savings
-engine. AI comes last, deliberately.
+| Area | State |
+|---|---|
+| `Money`, exact arithmetic | Done, property-tested |
+| CSV / OFX / QFX / QIF import | Done, golden-file tested against four bank layouts |
+| Merchant normalisation, dedup | Done — re-import is a no-op, enforced by unique index |
+| Encrypted ledger (Room + SQLCipher + Keystore) | Done |
+| Recurring-payment detection | Done |
+| Duplicate subscriptions, price rises | Done |
+| Import and savings UI, merchant tagging | Done |
+| PDF and screenshot-OCR import | Not started |
+| Budgeting (envelope, 50/30/20) | Not started |
+| Fees, cashflow forecast, what-if simulator | Not started |
+| AI layer | Not started — deliberately last |
+
+**Not yet verified on a device.** Everything above compiles and is covered by
+unit tests, but the app has never been launched: this machine has no emulator
+image and no device attached. SQLCipher's native library and the Keystore path
+in particular are exercised only by construction, not by execution. Treat the
+UI as unproven until it has been run.
+
+See [ADR 0001](docs/adr/0001-anthropic-sdk-on-android.md) for the
+Anthropic-SDK-on-Android investigation, which found a release-only failure that
+is invisible in debug builds.
