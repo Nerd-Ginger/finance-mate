@@ -87,6 +87,9 @@ dependencies {
     implementation(libs.androidx.lifecycle.runtime.ktx)
     implementation(libs.androidx.activity.compose)
     implementation(libs.androidx.navigation.compose)
+    // Holds the "has seen onboarding" flag. Deliberately outside the encrypted
+    // ledger - see OnboardingStore.
+    implementation(libs.androidx.datastore.preferences)
     // Runtime behind the type-safe navigation routes in ui/navigation/Routes.kt.
     implementation(libs.kotlinx.serialization.json)
     implementation(libs.androidx.lifecycle.viewmodel.compose)

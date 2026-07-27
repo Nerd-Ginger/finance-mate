@@ -6,6 +6,7 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.WindowInsets
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.navigationBars
 import androidx.compose.foundation.layout.padding
@@ -26,6 +27,7 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -47,23 +49,53 @@ import dev.financemate.feature.insight.subscription.Subscription
 import dev.financemate.ui.import.ImportScreen
 import dev.financemate.ui.import.ImportViewModel
 import dev.financemate.ui.navigation.Routes
+import dev.financemate.ui.onboarding.EgressProofScreen
+import dev.financemate.ui.onboarding.EgressProofViewModel
+import dev.financemate.ui.onboarding.OnboardingStore
+import dev.financemate.ui.onboarding.WelcomeScreen
 import dev.financemate.ui.savings.MerchantTagSheet
 import dev.financemate.ui.savings.SavingsScreen
 import dev.financemate.ui.savings.SavingsViewModel
 import dev.financemate.ui.theme.FinanceMate
 import dev.financemate.ui.theme.FinanceMateTheme
+import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.launch
 
 @Composable
 fun FinanceMateApp(container: AppContainer) {
     FinanceMateTheme {
-        AppScaffold(container)
+        val store = remember { OnboardingStore(container.appContext) }
+
+        // Read **once**, with `first()` rather than by collecting the flow.
+        //
+        // This is not a micro-optimisation, it is a correctness requirement.
+        // Finishing onboarding writes the flag, and if this were a live
+        // subscription that write would flip the value, change the NavHost's
+        // start destination, and rebuild the graph — discarding the back stack
+        // mid-navigation and dumping the user on the start destination instead
+        // of where they were going. Found exactly that way on the device.
+        var startWithOnboarding by remember { mutableStateOf<Boolean?>(null) }
+        LaunchedEffect(Unit) { startWithOnboarding = !store.hasCompleted.first() }
+
+        // `null` means "not read yet". Rendering the welcome screen on that first
+        // frame and then swapping it out would flash the introduction at every
+        // returning user, which is worse than a blank frame nobody notices.
+        when (val onboarding = startWithOnboarding) {
+            null -> Box(Modifier.fillMaxSize().background(MaterialTheme.colorScheme.background))
+            else -> AppScaffold(container, store, startWithOnboarding = onboarding)
+        }
     }
 }
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-private fun AppScaffold(container: AppContainer) {
+private fun AppScaffold(
+    container: AppContainer,
+    store: OnboardingStore,
+    startWithOnboarding: Boolean,
+) {
     val navController = rememberNavController()
+    val scope = rememberCoroutineScope()
     var taggingSubscription by remember { mutableStateOf<Subscription?>(null) }
 
     val savingsViewModel: SavingsViewModel = viewModel { SavingsViewModel(container) }
@@ -73,37 +105,90 @@ private fun AppScaffold(container: AppContainer) {
     val importState by importViewModel.state.collectAsStateWithLifecycle()
 
     val backStackEntry by navController.currentBackStackEntryAsState()
-    val inImportFlow = backStackEntry?.destination?.inGraph<Routes.Import>() == true
+    val destination = backStackEntry?.destination
+    val inImportFlow = destination?.inGraph<Routes.Import>() == true
+    val inOnboarding = destination?.inGraph<Routes.Onboarding>() == true
+
+    /**
+     * Leaves onboarding for the import flow, permanently.
+     *
+     * `popUpTo(Onboarding) { inclusive = true }` is what makes it a one-way door:
+     * somebody who has just imported their first statement must not be able to
+     * press back into the welcome screen.
+     *
+     * Two navigations rather than one, deliberately. Going straight to Import
+     * while popping onboarding leaves it alone on the back stack, so the first
+     * back press quits the app from the middle of an import. Landing on Main
+     * first gives the stack a floor to return to.
+     */
+    fun leaveOnboardingForImport() {
+        scope.launch { store.markCompleted() }
+        navController.navigate(Routes.Main) {
+            popUpTo(Routes.Onboarding) { inclusive = true }
+        }
+        navController.navigate(Routes.Import)
+    }
 
     Scaffold(
         containerColor = MaterialTheme.colorScheme.background,
         topBar = {
-            TopAppBar(
-                title = {
-                    Text(
-                        text = if (inImportFlow) "Import a statement" else "Savings",
-                        style = MaterialTheme.typography.titleMedium,
-                    )
-                },
-                colors = TopAppBarDefaults.topAppBarColors(
-                    containerColor = MaterialTheme.colorScheme.background,
-                    titleContentColor = MaterialTheme.colorScheme.onSurface,
-                ),
-            )
+            // Onboarding draws its own chrome. A bar reading "Savings" above the
+            // welcome screen would name a place the user has not been yet.
+            if (!inOnboarding) {
+                TopAppBar(
+                    title = {
+                        Text(
+                            text = if (inImportFlow) "Import a statement" else "Savings",
+                            style = MaterialTheme.typography.titleMedium,
+                        )
+                    },
+                    colors = TopAppBarDefaults.topAppBarColors(
+                        containerColor = MaterialTheme.colorScheme.background,
+                        titleContentColor = MaterialTheme.colorScheme.onSurface,
+                    ),
+                )
+            }
         },
         bottomBar = {
-            BottomBar(
-                importActive = inImportFlow,
-                onSavings = { navController.toSavings() },
-                onImport = { navController.navigate(Routes.Import) },
-            )
+            if (!inOnboarding) {
+                BottomBar(
+                    importActive = inImportFlow,
+                    onSavings = { navController.toSavings() },
+                    onImport = { navController.navigate(Routes.Import) },
+                )
+            }
         },
     ) { innerPadding ->
         NavHost(
             navController = navController,
-            startDestination = Routes.Main,
+            startDestination = if (startWithOnboarding) Routes.Onboarding else Routes.Main,
             modifier = Modifier.padding(innerPadding),
         ) {
+            navigation<Routes.Onboarding>(startDestination = Routes.Welcome) {
+                composable<Routes.Welcome> {
+                    WelcomeScreen(
+                        // Straight into the import flow, and onboarding is done
+                        // the moment they commit to it. Making them finish an
+                        // import first would leave a user who backed out stuck
+                        // seeing the welcome screen again.
+                        onImport = { leaveOnboardingForImport() },
+                        onSeeEgress = { navController.navigate(Routes.EgressProof) },
+                    )
+                }
+
+                composable<Routes.EgressProof> {
+                    val proofViewModel: EgressProofViewModel =
+                        viewModel { EgressProofViewModel(container) }
+                    val proofState by proofViewModel.state.collectAsStateWithLifecycle()
+
+                    EgressProofScreen(
+                        state = proofState,
+                        onBack = { navController.popBackStack() },
+                        onContinue = { navController.popBackStack() },
+                    )
+                }
+            }
+
             navigation<Routes.Main>(startDestination = Routes.Savings) {
                 composable<Routes.Savings> {
                     // Re-analyse each time this becomes current. Without it the

@@ -40,6 +40,15 @@ internal object Palette {
      */
     val OnPrimary = Canvas
 
+    /**
+     * Darker than [Canvas], and used for one thing: the egress log panel.
+     *
+     * The step down is the point. Network-touching surfaces are meant to look
+     * like instrumentation rather than interface, so they sit *below* the app's
+     * own background instead of raised above it like every other panel.
+     */
+    val EgressPanel = Color(0xFF050403)
+
     // --- The only two non-orange hues in the system. -------------------------
     val Income = Color(0xFF5FB980) // positive amounts only
     val Destructive = Color(0xFFE2543F) // actions that lose data
@@ -62,6 +71,12 @@ data class SemanticColours(
     val foundMoneyFill: Color,
     val foundMoneyBorder: Color,
     val foundMoneyText: Color,
+
+    /**
+     * Tappable text. Brighter than [foundMoney] because it sits on the canvas
+     * with no fill behind it to carry the contrast.
+     */
+    val foundMoneyLink: Color,
 
     /**
      * Ordinary spending. Deliberately **neutral** — the negative sign carries
@@ -101,13 +116,14 @@ internal val DefaultSemanticColours = SemanticColours(
     foundMoneyFill = Palette.Tint,
     foundMoneyBorder = Palette.Dim,
     foundMoneyText = Palette.Soft,
+    foundMoneyLink = Palette.Bright,
     moneyOut = Palette.PrimaryText,
     moneyIn = Palette.Income,
     uncertain = Palette.Outline,
     uncertainText = Palette.SecondaryText,
     destructive = Palette.Destructive,
     egressRule = Palette.Dim,
-    egressBackground = Palette.Canvas,
+    egressBackground = Palette.EgressPanel,
 )
 
 val LocalSemanticColours = staticCompositionLocalOf { DefaultSemanticColours }
