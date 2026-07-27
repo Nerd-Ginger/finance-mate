@@ -100,7 +100,7 @@ public fun SourcePickerScreen(
             Text(
                 // Counted from BankProfiles rather than written here, so adding a
                 // profile cannot leave this sentence quietly wrong.
-                text = "We recognise ${BankProfiles.AUTO_DETECTED.size} banks " +
+                text = "We recognize ${BankProfiles.AUTO_DETECTED.size} banks " +
                     "automatically. If yours isn't one, we'll show you the first " +
                     "rows and ask what they mean.",
                 style = MaterialTheme.typography.bodySmall,

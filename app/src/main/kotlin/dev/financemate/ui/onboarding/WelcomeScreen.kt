@@ -108,7 +108,10 @@ private fun PrivacyFacts(modifier: Modifier = Modifier) {
     val facts = listOf(
         "No bank login, ever",
         "No account, no server",
-        "Works with aeroplane mode on",
+        // "Airplane mode" is what the Android setting is actually called on a US
+        // device. This line asks the user to go and check, so it has to match
+        // the label they will be looking for.
+        "Works with airplane mode on",
     )
 
     Column(

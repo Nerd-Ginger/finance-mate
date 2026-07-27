@@ -268,9 +268,9 @@ private fun UntaggedPrompt(count: Int) {
     FindingCard(confidence = FindingConfidence.UNCERTAIN) {
         Text(
             text = if (count == 1) {
-                "1 recurring payment isn't recognised"
+                "1 recurring payment isn't recognized"
             } else {
-                "$count recurring payments aren't recognised"
+                "$count recurring payments aren't recognized"
             },
             style = MaterialTheme.typography.titleMedium,
             color = MaterialTheme.colorScheme.onSurface,

@@ -293,7 +293,7 @@ public class ImportViewModel(
 
         BankProfiles.matching(rows.first().fields)?.let { profile ->
             return CsvStatementParser.parse(content, profile.mapping) to
-                "CSV — recognised as ${profile.displayName}"
+                "CSV — recognized as ${profile.displayName}"
         }
 
         val detection = ColumnDetector.detect(rows)

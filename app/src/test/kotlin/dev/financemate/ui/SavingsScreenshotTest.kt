@@ -67,7 +67,7 @@ class SavingsScreenshotTest : ScreenshotTest() {
     fun failed() {
         capture("savings-failed") {
             SavingsScreen(
-                state = SavingsUiState.Failed("Could not analyse your transactions (IOException)."),
+                state = SavingsUiState.Failed("Could not analyze your transactions (IOException)."),
                 onTagMerchant = {},
             )
         }

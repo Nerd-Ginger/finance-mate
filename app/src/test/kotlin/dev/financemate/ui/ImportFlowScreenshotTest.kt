@@ -35,7 +35,7 @@ class ImportFlowScreenshotTest : ScreenshotTest() {
         capture("import-checkpoint") {
             CheckpointScreen(
                 fileName = "statement-jun.csv",
-                formatDescription = "CSV — recognised as Chase (checking)",
+                formatDescription = "CSV — recognized as Chase (checking)",
                 account = chaseChecking,
                 checkpoint = sampleCheckpoint(),
                 accounts = listOf(chaseChecking),
@@ -57,7 +57,7 @@ class ImportFlowScreenshotTest : ScreenshotTest() {
         capture("import-checkpoint-nothing-new") {
             CheckpointScreen(
                 fileName = "statement-jun.csv",
-                formatDescription = "CSV — recognised as Chase (checking)",
+                formatDescription = "CSV — recognized as Chase (checking)",
                 account = chaseChecking,
                 checkpoint = sampleCheckpoint(rowsToAdd = 0, alreadyInLedger = 240, skipped = emptyList()),
                 accounts = listOf(chaseChecking),

@@ -51,7 +51,7 @@ public class SavingsViewModel(
                     SavingsUiState.Failed(
                         // Never surface the raw message: it can contain merchant
                         // names and amounts, and this string may reach a log.
-                        message = "Could not analyse your transactions (${error.javaClass.simpleName}).",
+                        message = "Could not analyze your transactions (${error.javaClass.simpleName}).",
                     )
                 }
             }
