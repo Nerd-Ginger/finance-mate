@@ -51,6 +51,8 @@ public fun ImportScreen(
     onFilePicked: (android.net.Uri) -> Unit,
     onConfirm: (ImportUiState.Preview) -> Unit,
     onReset: () -> Unit,
+    /** Leaves the import flow entirely, returning to the savings view. */
+    onDone: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
     val context = LocalContext.current
@@ -92,7 +94,7 @@ public fun ImportScreen(
                 onCancel = onReset,
             )
 
-            is ImportUiState.Done -> DoneContent(state, onReset)
+            is ImportUiState.Done -> DoneContent(state, onReset, onDone)
 
             is ImportUiState.Failed -> {
                 Card(
@@ -187,7 +189,11 @@ private fun PreviewContent(
 }
 
 @Composable
-private fun DoneContent(state: ImportUiState.Done, onReset: () -> Unit) {
+private fun DoneContent(
+    state: ImportUiState.Done,
+    onReset: () -> Unit,
+    onDone: () -> Unit,
+) {
     Card {
         Column(Modifier.padding(16.dp), verticalArrangement = Arrangement.spacedBy(6.dp)) {
             Text("Import complete", style = MaterialTheme.typography.titleMedium)
@@ -212,7 +218,13 @@ private fun DoneContent(state: ImportUiState.Done, onReset: () -> Unit) {
             }
         }
     }
-    Button(onClick = onReset, modifier = Modifier.fillMaxWidth()) {
+    // Primary action is seeing the result, not importing again. The numbers are
+    // why the file was imported, so making the user find their own way back
+    // would waste the moment the app has just earned.
+    Button(onClick = onDone, modifier = Modifier.fillMaxWidth()) {
+        Text("See what changed")
+    }
+    OutlinedButton(onClick = onReset, modifier = Modifier.fillMaxWidth()) {
         Text("Import another file")
     }
 }

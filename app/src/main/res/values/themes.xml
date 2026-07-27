@@ -1,12 +1,18 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <!--
-        Colours and typography are supplied by Material 3 in Compose. This theme
-        exists only to give the Activity a sane starting window before Compose
-        takes over, so it deliberately carries no colour definitions.
+        The starting window, shown for the moment before Compose draws.
+
+        windowBackground is the canvas black from the design system rather than
+        the platform default. Without it the app flashes white on every cold
+        start, which is jarring against a dark-first interface and reads as a
+        bug. The rest of the styling lives in Compose.
     -->
     <style name="Theme.FinanceMate" parent="android:Theme.Material.NoActionBar">
+        <item name="android:windowBackground">@color/canvas</item>
         <item name="android:statusBarColor">@android:color/transparent</item>
         <item name="android:navigationBarColor">@android:color/transparent</item>
+        <item name="android:windowLightStatusBar">false</item>
+        <item name="android:windowLightNavigationBar">false</item>
     </style>
 </resources>

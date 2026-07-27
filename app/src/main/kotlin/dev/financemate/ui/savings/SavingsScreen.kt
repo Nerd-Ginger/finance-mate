@@ -1,17 +1,20 @@
 package dev.financemate.ui.savings
 
+import androidx.compose.foundation.BorderStroke
+import androidx.compose.foundation.background
+import androidx.compose.foundation.border
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
-import androidx.compose.material3.AssistChip
-import androidx.compose.material3.Card
-import androidx.compose.material3.CardDefaults
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.MaterialTheme
@@ -23,32 +26,41 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import dev.financemate.core.money.CurrencyCode
+import dev.financemate.core.money.Money
 import dev.financemate.feature.insight.subscription.DuplicateSubscriptionFinding
 import dev.financemate.feature.insight.subscription.PriceChangeFinding
 import dev.financemate.feature.insight.subscription.Subscription
+import dev.financemate.feature.insight.subscription.SubscriptionReport
+import dev.financemate.ui.components.ConfidenceChip
+import dev.financemate.ui.components.DetailRow
+import dev.financemate.ui.components.FindingCard
+import dev.financemate.ui.components.FindingConfidence
+import dev.financemate.ui.components.SectionLabel
 import dev.financemate.ui.formatted
 import dev.financemate.ui.formattedRounded
+import dev.financemate.ui.theme.FinanceMate
 import dev.financemate.ui.theme.FinanceMateTheme
 import java.time.format.DateTimeFormatter
 
 private val DATE_FORMAT: DateTimeFormatter = DateTimeFormatter.ofPattern("d MMM yyyy")
 
 @Composable
-public fun SavingsScreen(
+fun SavingsScreen(
     state: SavingsUiState,
     onTagMerchant: (Subscription) -> Unit,
     modifier: Modifier = Modifier,
 ) {
     when (state) {
-        SavingsUiState.Loading -> CentredMessage("Analysing your transactions…", showSpinner = true)
+        SavingsUiState.Loading -> CentredMessage("Reading your transactions…", showSpinner = true)
 
         is SavingsUiState.Failed -> CentredMessage(state.message)
 
         is SavingsUiState.Loaded -> if (!state.hasAnyData) {
             CentredMessage(
-                "No recurring payments found yet.\n\n" +
-                    "Import a bank statement and FinanceMate will look for " +
-                    "subscriptions, duplicates, and price rises — all on this device.",
+                "Nothing recurring yet.\n\n" +
+                    "Import a statement and FinanceMate will look for subscriptions, " +
+                    "overlaps and price rises — all on this phone.",
             )
         } else {
             LoadedSavings(state, onTagMerchant, modifier)
@@ -66,124 +78,145 @@ private fun LoadedSavings(
 
     LazyColumn(
         modifier = modifier.fillMaxSize(),
-        contentPadding = androidx.compose.foundation.layout.PaddingValues(16.dp),
-        verticalArrangement = Arrangement.spacedBy(12.dp),
+        contentPadding = PaddingValues(horizontal = 20.dp, vertical = 16.dp),
+        verticalArrangement = Arrangement.spacedBy(16.dp),
     ) {
-        item {
-            HeadlineCard(
-                annualTotal = report.totalAnnualCost.formattedRounded(),
-                monthlyTotal = report.totalMonthlyCost.formatted(),
-                subscriptionCount = report.activeSubscriptions.size,
-                identifiedSavings = report.identifiedAnnualSavings
-                    .takeIf { !it.isZero }
-                    ?.formattedRounded(),
-            )
-        }
+        item { Headline(report) }
 
         if (report.duplicates.isNotEmpty()) {
-            item { SectionHeading("Overlapping subscriptions") }
+            item { SectionLabel("Overlapping") }
             items(report.duplicates) { DuplicateCard(it) }
         }
 
         if (report.priceIncreases.isNotEmpty()) {
-            item { SectionHeading("Price rises") }
+            item { SectionLabel("Price rises") }
             items(report.priceIncreases) { PriceRiseCard(it) }
         }
 
         if (state.untaggedMerchantCount > 0) {
-            item {
-                Card {
-                    Column(Modifier.padding(16.dp), verticalArrangement = Arrangement.spacedBy(4.dp)) {
-                        Text("Help find more savings", style = MaterialTheme.typography.titleMedium)
-                        Text(
-                            "${state.untaggedMerchantCount} recurring payments aren't " +
-                                "recognised yet. Tap one below to say what it is, and " +
-                                "FinanceMate can spot overlaps with your other subscriptions.",
-                            style = MaterialTheme.typography.bodyMedium,
-                        )
-                    }
-                }
-            }
+            item { UntaggedPrompt(state.untaggedMerchantCount) }
         }
 
-        item { SectionHeading("All subscriptions") }
-        items(report.activeSubscriptions) { subscription ->
-            SubscriptionRow(subscription, onClick = { onTagMerchant(subscription) })
-        }
+        item { SectionLabel("All subscriptions") }
+        items(report.activeSubscriptions) { SubscriptionRow(it, onClick = { onTagMerchant(it) }) }
 
         if (report.cancelledSubscriptions.isNotEmpty()) {
-            item { SectionHeading("No longer charging") }
-            items(report.cancelledSubscriptions) { subscription ->
-                SubscriptionRow(subscription, onClick = { onTagMerchant(subscription) }, dimmed = true)
+            item { SectionLabel("No longer charging") }
+            items(report.cancelledSubscriptions) {
+                SubscriptionRow(it, onClick = { onTagMerchant(it) }, dimmed = true)
             }
         }
     }
 }
 
+/**
+ * The number the app leads with.
+ *
+ * Framed as **current annualised recurring spend**, with the overlap called out
+ * separately and explicitly labelled as not yet saved. A headline reading
+ * "you've saved $146" would be a lie until the user actually cancels something,
+ * and getting caught in that lie once would cost every other number in the app
+ * its credibility.
+ */
 @Composable
-private fun HeadlineCard(
-    annualTotal: String,
-    monthlyTotal: String,
-    subscriptionCount: Int,
-    identifiedSavings: String?,
-) {
-    Card(colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.primaryContainer)) {
-        Column(Modifier.padding(20.dp), verticalArrangement = Arrangement.spacedBy(6.dp)) {
-            Text("Recurring payments", style = MaterialTheme.typography.labelLarge)
-            Text(
-                annualTotal,
-                style = MaterialTheme.typography.displaySmall,
-                fontWeight = FontWeight.Bold,
+private fun Headline(report: SubscriptionReport) {
+    val colours = FinanceMate.colours
+    val count = report.activeSubscriptions.size
+    val overlap = report.identifiedAnnualSavings
+
+    Column(
+        modifier = Modifier
+            .fillMaxWidth()
+            .background(MaterialTheme.colorScheme.surfaceContainerLow, RoundedCornerShape(16.dp))
+            .border(
+                BorderStroke(1.dp, MaterialTheme.colorScheme.outlineVariant),
+                RoundedCornerShape(16.dp),
+            )
+            .padding(24.dp),
+        verticalArrangement = Arrangement.spacedBy(6.dp),
+    ) {
+        SectionLabel("Recurring, per year")
+        Text(
+            text = report.totalAnnualCost.formattedRounded(),
+            style = MaterialTheme.typography.displaySmall.copy(fontFeatureSettings = "tnum"),
+            color = MaterialTheme.colorScheme.onSurface,
+        )
+        Text(
+            text = "${report.totalMonthlyCost.formatted()} a month · " +
+                "$count ${if (count == 1) "subscription" else "subscriptions"}",
+            style = MaterialTheme.typography.bodyMedium,
+            color = MaterialTheme.colorScheme.onSurfaceVariant,
+        )
+
+        if (!overlap.isZero) {
+            HorizontalDivider(
+                modifier = Modifier.padding(vertical = 12.dp),
+                color = MaterialTheme.colorScheme.outlineVariant,
             )
             Text(
-                "a year — $monthlyTotal a month across $subscriptionCount " +
-                    if (subscriptionCount == 1) "subscription" else "subscriptions",
-                style = MaterialTheme.typography.bodyMedium,
+                text = overlap.formattedRounded(),
+                style = MaterialTheme.typography.headlineSmall.copy(fontFeatureSettings = "tnum"),
+                color = colours.foundMoney,
             )
-            identifiedSavings?.let {
-                HorizontalDivider(Modifier.padding(vertical = 8.dp))
-                Text(
-                    "$it a year in overlapping subscriptions",
-                    style = MaterialTheme.typography.titleMedium,
-                    fontWeight = FontWeight.SemiBold,
-                )
-            }
+            Text(
+                text = "a year sitting in overlapping subscriptions. Not saved yet — " +
+                    "it becomes real when you cancel something.",
+                style = MaterialTheme.typography.bodySmall,
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
+            )
         }
     }
 }
 
 @Composable
 private fun DuplicateCard(finding: DuplicateSubscriptionFinding) {
-    Card {
-        Column(Modifier.padding(16.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
-            Row(
-                Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.SpaceBetween,
-                verticalAlignment = Alignment.CenterVertically,
-            ) {
-                Text(finding.serviceClass.displayName, style = MaterialTheme.typography.titleMedium)
-                Text(
-                    "Save ${finding.potentialAnnualSaving.formattedRounded()}/yr",
-                    style = MaterialTheme.typography.titleSmall,
-                    fontWeight = FontWeight.SemiBold,
+    val colours = FinanceMate.colours
+    val count = finding.subscriptions.size
+
+    FindingCard(confidence = FindingConfidence.CERTAIN) {
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.SpaceBetween,
+            verticalAlignment = Alignment.Top,
+        ) {
+            Text(
+                text = "You're paying for $count ${finding.serviceClass.displayName.lowercase()} services",
+                style = MaterialTheme.typography.titleLarge,
+                color = MaterialTheme.colorScheme.onSurface,
+                modifier = Modifier.weight(1f).padding(end = 12.dp),
+            )
+            ConfidenceChip(FindingConfidence.CERTAIN, 1.0)
+        }
+
+        Column(verticalArrangement = Arrangement.spacedBy(6.dp)) {
+            finding.subscriptions.forEach { subscription ->
+                DetailRow(
+                    label = "${subscription.merchantKey.value} · " +
+                        subscription.cadence.displayName.lowercase(),
+                    value = "−${subscription.currentAmount.formatted()}",
+                    labelColour = colours.foundMoneyText,
+                    valueColour = colours.foundMoneyText,
                 )
             }
+        }
+
+        HorizontalDivider(color = colours.foundMoneyBorder.copy(alpha = 0.6f))
+
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.SpaceBetween,
+            verticalAlignment = Alignment.Bottom,
+        ) {
             Text(
-                "You're paying for ${finding.subscriptions.size} of these.",
-                style = MaterialTheme.typography.bodyMedium,
-            )
-            finding.subscriptions.forEach { subscription ->
-                Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
-                    Text(subscription.merchantKey.value, style = MaterialTheme.typography.bodyMedium)
-                    Text(
-                        "${subscription.currentAmount.formatted()} ${subscription.cadence.displayName.lowercase()}",
-                        style = MaterialTheme.typography.bodyMedium,
-                    )
-                }
-            }
-            Text(
-                "Estimate assumes keeping the cheapest.",
+                text = "Assumes keeping the cheapest",
                 style = MaterialTheme.typography.bodySmall,
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
+                modifier = Modifier.weight(1f).padding(end = 12.dp),
+            )
+            Text(
+                text = "${finding.potentialAnnualSaving.formattedRounded()}/yr",
+                style = MaterialTheme.typography.headlineSmall.copy(fontFeatureSettings = "tnum"),
+                color = colours.foundMoney,
             )
         }
     }
@@ -191,20 +224,46 @@ private fun DuplicateCard(finding: DuplicateSubscriptionFinding) {
 
 @Composable
 private fun PriceRiseCard(finding: PriceChangeFinding) {
-    Card {
-        Column(Modifier.padding(16.dp), verticalArrangement = Arrangement.spacedBy(4.dp)) {
-            Text(finding.merchantKey.value, style = MaterialTheme.typography.titleMedium)
-            Text(
-                "${finding.previousAmount.formatted()} → ${finding.currentAmount.formatted()}" +
-                    (finding.changedOn?.let { " on ${it.format(DATE_FORMAT)}" } ?: ""),
-                style = MaterialTheme.typography.bodyMedium,
-            )
-            Text(
-                "${finding.annualImpact.formatted()} more a year",
-                style = MaterialTheme.typography.bodyMedium,
-                fontWeight = FontWeight.SemiBold,
-            )
-        }
+    val colours = FinanceMate.colours
+
+    FindingCard(confidence = FindingConfidence.CERTAIN) {
+        Text(
+            text = finding.merchantKey.value,
+            style = MaterialTheme.typography.titleLarge,
+            color = MaterialTheme.colorScheme.onSurface,
+        )
+        Text(
+            text = buildString {
+                append(finding.previousAmount.formatted())
+                append("  →  ")
+                append(finding.currentAmount.formatted())
+                finding.changedOn?.let { append(" on ${it.format(DATE_FORMAT)}") }
+            },
+            style = MaterialTheme.typography.bodyMedium.copy(fontFeatureSettings = "tnum"),
+            color = colours.foundMoneyText,
+        )
+        Text(
+            text = "${finding.annualImpact.formatted()} more a year",
+            style = MaterialTheme.typography.titleMedium.copy(fontFeatureSettings = "tnum"),
+            color = colours.foundMoney,
+        )
+    }
+}
+
+@Composable
+private fun UntaggedPrompt(count: Int) {
+    FindingCard(confidence = FindingConfidence.UNCERTAIN) {
+        Text(
+            text = "$count recurring payments aren't recognised",
+            style = MaterialTheme.typography.titleMedium,
+            color = MaterialTheme.colorScheme.onSurface,
+        )
+        Text(
+            text = "Tap one below to say what it is. FinanceMate can then spot " +
+                "overlaps with your other subscriptions.",
+            style = MaterialTheme.typography.bodyMedium,
+            color = MaterialTheme.colorScheme.onSurfaceVariant,
+        )
     }
 }
 
@@ -214,94 +273,125 @@ private fun SubscriptionRow(
     onClick: () -> Unit,
     dimmed: Boolean = false,
 ) {
-    Card(onClick = onClick) {
-        Column(Modifier.padding(16.dp), verticalArrangement = Arrangement.spacedBy(4.dp)) {
-            Row(
-                Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.SpaceBetween,
-                verticalAlignment = Alignment.CenterVertically,
-            ) {
-                Text(
-                    subscription.merchantKey.value,
-                    style = MaterialTheme.typography.titleSmall,
-                    modifier = Modifier.weight(1f),
-                )
-                Text(subscription.currentAmount.formatted(), style = MaterialTheme.typography.titleSmall)
-            }
-            Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                Text(
-                    subscription.cadence.displayName,
-                    style = MaterialTheme.typography.bodySmall,
-                )
-                Text(
-                    "· ${subscription.annualCost.formattedRounded()}/yr",
-                    style = MaterialTheme.typography.bodySmall,
-                )
-                if (!dimmed) {
-                    Text(
-                        "· next ${subscription.nextExpected.format(DATE_FORMAT)}",
-                        style = MaterialTheme.typography.bodySmall,
+    val colours = FinanceMate.colours
+    val confidence = FindingConfidence.from(subscription.confidence)
+    val shape = RoundedCornerShape(12.dp)
+
+    val nameColour = if (dimmed) {
+        MaterialTheme.colorScheme.onSurfaceVariant
+    } else {
+        MaterialTheme.colorScheme.onSurface
+    }
+
+    Column(
+        modifier = Modifier
+            .fillMaxWidth()
+            .background(MaterialTheme.colorScheme.surfaceContainerLow, shape)
+            .border(BorderStroke(1.dp, MaterialTheme.colorScheme.outlineVariant), shape)
+            .clickable(onClick = onClick)
+            .padding(16.dp),
+        verticalArrangement = Arrangement.spacedBy(6.dp),
+    ) {
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.SpaceBetween,
+            verticalAlignment = Alignment.CenterVertically,
+        ) {
+            Text(
+                text = subscription.merchantKey.value,
+                style = MaterialTheme.typography.titleSmall,
+                color = nameColour,
+                modifier = Modifier.weight(1f).padding(end = 12.dp),
+            )
+            Text(
+                // Ordinary spending stays neutral. The minus sign carries the
+                // meaning; colouring it would make every subscription look like
+                // a problem, and most of them are things the user wants.
+                text = "−${subscription.currentAmount.formatted()}",
+                style = MaterialTheme.typography.titleSmall.copy(fontFeatureSettings = "tnum"),
+                color = if (dimmed) MaterialTheme.colorScheme.onSurfaceVariant else colours.moneyOut,
+            )
+        }
+
+        Text(
+            text = buildString {
+                append(subscription.cadence.displayName)
+                append(" · ")
+                append("${subscription.annualCost.formattedRounded()}/yr")
+                if (!dimmed) append(" · next ${subscription.nextExpected.format(DATE_FORMAT)}")
+            },
+            style = MaterialTheme.typography.bodySmall.copy(fontFeatureSettings = "tnum"),
+            color = MaterialTheme.colorScheme.onSurfaceVariant,
+        )
+
+        Row(
+            horizontalArrangement = Arrangement.spacedBy(8.dp),
+            verticalAlignment = Alignment.CenterVertically,
+        ) {
+            Text(
+                text = subscription.serviceClass?.displayName ?: "Tap to categorise",
+                style = MaterialTheme.typography.bodySmall,
+                color = if (subscription.serviceClass == null) {
+                    colours.foundMoney
+                } else {
+                    MaterialTheme.colorScheme.onSurfaceVariant
+                },
+                modifier = Modifier
+                    .border(
+                        BorderStroke(
+                            1.dp,
+                            if (subscription.serviceClass == null) {
+                                colours.foundMoneyBorder
+                            } else {
+                                MaterialTheme.colorScheme.outlineVariant
+                            },
+                        ),
+                        RoundedCornerShape(3.dp),
                     )
-                }
-            }
-            Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                AssistChip(
-                    onClick = onClick,
-                    label = { Text(subscription.serviceClass?.displayName ?: "Tap to categorise") },
-                )
-                // Confidence is shown rather than hidden. A pattern the app is
-                // unsure about is still worth surfacing, but the user deserves to
-                // know how much weight to put on it.
-                if (subscription.confidence < 0.75) {
-                    AssistChip(onClick = onClick, label = { Text("Unsure") })
-                }
+                    .padding(horizontal = 8.dp, vertical = 4.dp),
+            )
+            if (confidence != FindingConfidence.CERTAIN) {
+                ConfidenceChip(confidence, subscription.confidence)
             }
         }
     }
 }
 
 @Composable
-private fun SectionHeading(text: String) {
-    Text(
-        text,
-        style = MaterialTheme.typography.titleMedium,
-        modifier = Modifier.padding(top = 8.dp),
-    )
-}
-
-@Composable
 private fun CentredMessage(message: String, showSpinner: Boolean = false) {
-    Box(Modifier.fillMaxSize().padding(32.dp), contentAlignment = Alignment.Center) {
+    Box(
+        modifier = Modifier.fillMaxSize().padding(32.dp),
+        contentAlignment = Alignment.Center,
+    ) {
         Column(
             horizontalAlignment = Alignment.CenterHorizontally,
-            verticalArrangement = Arrangement.spacedBy(16.dp),
+            verticalArrangement = Arrangement.spacedBy(20.dp),
         ) {
-            if (showSpinner) CircularProgressIndicator()
+            if (showSpinner) {
+                CircularProgressIndicator(color = FinanceMate.colours.foundMoney)
+            }
             Text(
-                message,
+                text = message,
                 style = MaterialTheme.typography.bodyLarge,
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
                 textAlign = TextAlign.Center,
             )
         }
     }
 }
 
-@Preview(showBackground = true)
+@Preview(showBackground = true, backgroundColor = 0xFF0A0908)
 @Composable
 private fun EmptyPreview() {
-    FinanceMateTheme(dynamicColor = false) {
+    FinanceMateTheme {
         SavingsScreen(
             state = SavingsUiState.Loaded(
-                report = dev.financemate.feature.insight.subscription.SubscriptionReport(
+                report = SubscriptionReport(
                     subscriptions = emptyList(),
                     duplicates = emptyList(),
                     priceIncreases = emptyList(),
-                    totalAnnualCost = dev.financemate.core.money.Money.zero(
-                        dev.financemate.core.money.CurrencyCode.USD,
-                    ),
-                    totalMonthlyCost = dev.financemate.core.money.Money.zero(
-                        dev.financemate.core.money.CurrencyCode.USD,
-                    ),
+                    totalAnnualCost = Money.zero(CurrencyCode.USD),
+                    totalMonthlyCost = Money.zero(CurrencyCode.USD),
                 ),
                 untaggedMerchantCount = 0,
             ),

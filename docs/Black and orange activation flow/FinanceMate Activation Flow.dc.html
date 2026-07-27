@@ -1,0 +1,622 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<meta name="design_doc_mode" content="canvas" />
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="" />
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet" />
+<style>
+  body { margin: 0; background: #050403; }
+  a { color: #FF9A4D; text-decoration: none; }
+  a:hover { color: #FFC894; }
+</style>
+</helmet>
+
+<div style="padding:72px 64px 96px;background:#050403;font-family:'IBM Plex Sans',Helvetica,sans-serif;color:#F2EDE8;box-sizing:border-box;display:flex;flex-direction:column;gap:56px;width:max-content">
+
+  <div style="display:flex;justify-content:space-between;align-items:flex-end;gap:64px;max-width:1800px">
+    <div style="display:flex;flex-direction:column;gap:12px;max-width:720px">
+      <span style="font:500 11px/1 'IBM Plex Mono',monospace;letter-spacing:0.14em;text-transform:uppercase;color:#FF7A18">FinanceMate · Flow 01</span>
+      <h1 style="margin:0;font:600 44px/1.05 'IBM Plex Sans',sans-serif;letter-spacing:-0.02em">First run → first import → first insight</h1>
+      <p style="margin:0;font:400 15px/1.55 'IBM Plex Sans',sans-serif;color:#A39C95;text-wrap:pretty">The activation path, dark mode, Pixel 8 Pro proportions. Eight screens between opening the app and being told something true about your own money. Everything before screen 6 is friction — it is designed to be short, and to spend its few words proving the on-device claim rather than selling.</p>
+    </div>
+    <div style="display:flex;flex-direction:column;gap:10px;flex-shrink:0;font:400 12px/1.5 'IBM Plex Mono',monospace;color:#5C5651">
+      <span style="color:#A39C95">Palette · black &amp; orange</span>
+      <div style="display:flex;gap:6px">
+        <span style="width:28px;height:28px;border-radius:2px;background:#0A0908;border:1px solid #332F2C"></span>
+        <span style="width:28px;height:28px;border-radius:2px;background:#1A1817"></span>
+        <span style="width:28px;height:28px;border-radius:2px;background:#FF7A18"></span>
+        <span style="width:28px;height:28px;border-radius:2px;background:#FFC894"></span>
+        <span style="width:28px;height:28px;border-radius:2px;background:#5FB980"></span>
+      </div>
+      <span>3 taps to import · 5 to insight</span>
+    </div>
+  </div>
+
+  <div style="display:flex;gap:56px">
+
+    <!-- 01 WELCOME -->
+    <div style="display:flex;flex-direction:column;gap:16px;width:400px;flex-shrink:0">
+      <div style="width:400px;height:890px;background:#0A0908;border:1px solid #24211F;border-radius:32px;overflow:hidden;display:flex;flex-direction:column">
+        <div style="height:48px;display:flex;align-items:center;justify-content:space-between;padding:0 28px;flex-shrink:0">
+          <span style="font:500 13px/1 'IBM Plex Sans',sans-serif;color:#F2EDE8">9:41</span>
+          <div style="display:flex;gap:6px;align-items:center">
+            <span style="width:16px;height:10px;border-radius:2px;background:#5C5651"></span>
+            <span style="width:22px;height:11px;border-radius:3px;border:1px solid #5C5651"></span>
+          </div>
+        </div>
+        <div style="flex:1;display:flex;flex-direction:column;padding:56px 28px 0">
+          <span style="font:500 11px/1 'IBM Plex Mono',monospace;letter-spacing:0.16em;text-transform:uppercase;color:#FF7A18">FinanceMate</span>
+          <h2 style="margin:28px 0 0;font:600 38px/1.1 'IBM Plex Sans',sans-serif;letter-spacing:-0.02em;color:#F2EDE8;text-wrap:pretty">Find the money you forgot you were spending.</h2>
+          <p style="margin:20px 0 0;font:400 16px/1.55 'IBM Plex Sans',sans-serif;color:#A39C95;text-wrap:pretty">Import a statement you already have. FinanceMate reads it on this phone and tells you what's leaking — duplicate services, quiet price rises, fees.</p>
+          <div style="margin-top:40px;display:flex;flex-direction:column;gap:1px;background:#24211F;border:1px solid #24211F;border-radius:12px;overflow:hidden">
+            <div style="display:flex;align-items:center;gap:14px;padding:18px 20px;background:#121110">
+              <span style="width:8px;height:8px;border-radius:999px;background:#FF7A18;flex-shrink:0"></span>
+              <span style="font:400 15px/1.3 'IBM Plex Sans',sans-serif;color:#F2EDE8">No bank login, ever</span>
+            </div>
+            <div style="display:flex;align-items:center;gap:14px;padding:18px 20px;background:#121110">
+              <span style="width:8px;height:8px;border-radius:999px;background:#FF7A18;flex-shrink:0"></span>
+              <span style="font:400 15px/1.3 'IBM Plex Sans',sans-serif;color:#F2EDE8">No account, no server</span>
+            </div>
+            <div style="display:flex;align-items:center;gap:14px;padding:18px 20px;background:#121110">
+              <span style="width:8px;height:8px;border-radius:999px;background:#FF7A18;flex-shrink:0"></span>
+              <span style="font:400 15px/1.3 'IBM Plex Sans',sans-serif;color:#F2EDE8">Works with aeroplane mode on</span>
+            </div>
+          </div>
+        </div>
+        <div style="padding:0 28px 36px;display:flex;flex-direction:column;gap:16px;flex-shrink:0">
+          <div style="height:56px;border-radius:999px;background:#FF7A18;display:flex;align-items:center;justify-content:center;font:500 16px/1 'IBM Plex Sans',sans-serif;color:#0A0908">Import a statement</div>
+          <div style="height:52px;display:flex;align-items:center;justify-content:center;font:400 15px/1 'IBM Plex Sans',sans-serif;color:#FF9A4D">See what leaves this device</div>
+          <div style="width:120px;height:4px;border-radius:999px;background:#332F2C;align-self:center;margin-top:4px"></div>
+        </div>
+      </div>
+      <sc-if value="{{ showAnnotations }}" hint-placeholder-val="{{ true }}">
+      <div style="display:flex;flex-direction:column;gap:6px;width:400px">
+        <span style="font:500 11px/1 'IBM Plex Mono',monospace;letter-spacing:0.12em;color:#FF7A18">01 · WELCOME</span>
+        <span style="font:400 13px/1.5 'IBM Plex Sans',sans-serif;color:#5C5651;text-wrap:pretty">One screen, not a carousel. The privacy claim is three facts, not a paragraph — and it is a link, so a sceptic can verify it before handing over a file.</span>
+      </div>
+      </sc-if>
+    </div>
+
+    <!-- 02 PROOF -->
+    <div style="display:flex;flex-direction:column;gap:16px;width:400px;flex-shrink:0">
+      <div style="width:400px;height:890px;background:#0A0908;border:1px solid #24211F;border-radius:32px;overflow:hidden;display:flex;flex-direction:column">
+        <div style="height:48px;display:flex;align-items:center;justify-content:space-between;padding:0 28px;flex-shrink:0">
+          <span style="font:500 13px/1 'IBM Plex Sans',sans-serif;color:#F2EDE8">9:41</span>
+          <div style="display:flex;gap:6px;align-items:center">
+            <span style="width:16px;height:10px;border-radius:2px;background:#5C5651"></span>
+            <span style="width:22px;height:11px;border-radius:3px;border:1px solid #5C5651"></span>
+          </div>
+        </div>
+        <div style="height:56px;display:flex;align-items:center;gap:18px;padding:0 28px;flex-shrink:0">
+          <span style="font:400 22px/1 'IBM Plex Sans',sans-serif;color:#F2EDE8">←</span>
+          <span style="font:500 17px/1 'IBM Plex Sans',sans-serif;color:#F2EDE8">What leaves this device</span>
+        </div>
+        <div style="flex:1;display:flex;flex-direction:column;padding:12px 28px 0;gap:24px;overflow:hidden">
+          <p style="margin:0;font:400 15px/1.55 'IBM Plex Sans',sans-serif;color:#A39C95;text-wrap:pretty">Nothing, unless you switch on an AI feature. This list is generated from the code that is allowed to use the network — there is only one such module.</p>
+          <div style="display:flex;flex-direction:column;gap:1px;background:#24211F;border:1px solid #24211F;border-radius:12px;overflow:hidden">
+            <div style="display:flex;justify-content:space-between;align-items:center;gap:16px;padding:16px 18px;background:#121110">
+              <span style="font:400 14px/1.35 'IBM Plex Sans',sans-serif;color:#F2EDE8">Your statement file</span>
+              <span style="font:500 11px/1 'IBM Plex Mono',monospace;letter-spacing:0.06em;color:#A39C95;white-space:nowrap">NEVER</span>
+            </div>
+            <div style="display:flex;justify-content:space-between;align-items:center;gap:16px;padding:16px 18px;background:#121110">
+              <span style="font:400 14px/1.35 'IBM Plex Sans',sans-serif;color:#F2EDE8">Amounts, dates, balances</span>
+              <span style="font:500 11px/1 'IBM Plex Mono',monospace;letter-spacing:0.06em;color:#A39C95;white-space:nowrap">NEVER</span>
+            </div>
+            <div style="display:flex;justify-content:space-between;align-items:center;gap:16px;padding:16px 18px;background:#121110">
+              <span style="font:400 14px/1.35 'IBM Plex Sans',sans-serif;color:#F2EDE8">Account numbers</span>
+              <span style="font:500 11px/1 'IBM Plex Mono',monospace;letter-spacing:0.06em;color:#A39C95;white-space:nowrap">NEVER</span>
+            </div>
+            <div style="display:flex;justify-content:space-between;align-items:center;gap:16px;padding:16px 18px;background:#1A1817">
+              <span style="font:400 14px/1.35 'IBM Plex Sans',sans-serif;color:#F2EDE8;max-width:230px;text-wrap:pretty">Redacted merchant names, if you turn on AI</span>
+              <span style="font:500 11px/1 'IBM Plex Mono',monospace;letter-spacing:0.06em;color:#0A0908;background:#FF7A18;padding:5px 8px;border-radius:3px;white-space:nowrap">OPT-IN</span>
+            </div>
+          </div>
+          <div style="display:flex;flex-direction:column;gap:12px">
+            <span style="font:500 11px/1 'IBM Plex Mono',monospace;letter-spacing:0.12em;text-transform:uppercase;color:#5C5651">Egress log</span>
+            <div style="background:#050403;border:1px solid #24211F;border-radius:10px;padding:20px;display:flex;flex-direction:column;gap:10px">
+              <span style="font:400 13px/1.5 'IBM Plex Mono',monospace;color:#F2EDE8">0 requests since install</span>
+              <span style="font:400 12px/1.5 'IBM Plex Mono',monospace;color:#5C5651">Every request the app ever makes is recorded here with its exact payload. You can read it any time, including before you decide to trust us.</span>
+            </div>
+          </div>
+          <div style="display:flex;align-items:center;gap:12px;padding:16px 18px;border:1px solid #24211F;border-radius:12px">
+            <span style="width:8px;height:8px;border-radius:999px;background:#5FB980;flex-shrink:0"></span>
+            <span style="font:400 13px/1.45 'IBM Plex Sans',sans-serif;color:#A39C95;text-wrap:pretty">Ledger is encrypted with a key generated on this phone and held in its secure hardware.</span>
+          </div>
+        </div>
+        <div style="padding:0 28px 36px;display:flex;flex-direction:column;gap:12px;flex-shrink:0">
+          <div style="height:56px;border-radius:999px;background:#FF7A18;display:flex;align-items:center;justify-content:center;font:500 16px/1 'IBM Plex Sans',sans-serif;color:#0A0908">Continue</div>
+          <div style="width:120px;height:4px;border-radius:999px;background:#332F2C;align-self:center;margin-top:4px"></div>
+        </div>
+      </div>
+      <sc-if value="{{ showAnnotations }}" hint-placeholder-val="{{ true }}">
+      <div style="display:flex;flex-direction:column;gap:6px;width:400px">
+        <span style="font:500 11px/1 'IBM Plex Mono',monospace;letter-spacing:0.12em;color:#FF7A18">02 · PROOF — OPTIONAL DETOUR</span>
+        <span style="font:400 13px/1.5 'IBM Plex Sans',sans-serif;color:#5C5651;text-wrap:pretty">The egress log is not buried in settings; it is offered before the first file. Network things are mono on pure black everywhere in the app, so they are recognisable on sight.</span>
+      </div>
+      </sc-if>
+    </div>
+
+    <!-- 03 SOURCE -->
+    <div style="display:flex;flex-direction:column;gap:16px;width:400px;flex-shrink:0">
+      <div style="width:400px;height:890px;background:#0A0908;border:1px solid #24211F;border-radius:32px;overflow:hidden;display:flex;flex-direction:column">
+        <div style="height:48px;display:flex;align-items:center;justify-content:space-between;padding:0 28px;flex-shrink:0">
+          <span style="font:500 13px/1 'IBM Plex Sans',sans-serif;color:#F2EDE8">9:41</span>
+          <div style="display:flex;gap:6px;align-items:center">
+            <span style="width:16px;height:10px;border-radius:2px;background:#5C5651"></span>
+            <span style="width:22px;height:11px;border-radius:3px;border:1px solid #5C5651"></span>
+          </div>
+        </div>
+        <div style="height:56px;display:flex;align-items:center;gap:18px;padding:0 28px;flex-shrink:0">
+          <span style="font:400 22px/1 'IBM Plex Sans',sans-serif;color:#F2EDE8">←</span>
+          <span style="font:500 17px/1 'IBM Plex Sans',sans-serif;color:#F2EDE8">Add a statement</span>
+        </div>
+        <div style="flex:1;display:flex;flex-direction:column;padding:12px 28px 0;gap:20px">
+          <p style="margin:0;font:400 15px/1.55 'IBM Plex Sans',sans-serif;color:#A39C95;text-wrap:pretty">One month is enough to start. The file is read here and then encrypted into your ledger.</p>
+          <div style="display:flex;flex-direction:column;gap:12px">
+            <div style="border:1px solid #B85A14;background:#2A1608;border-radius:14px;padding:22px 20px;display:flex;flex-direction:column;gap:6px">
+              <div style="display:flex;justify-content:space-between;align-items:center;gap:12px">
+                <span style="font:500 17px/1.2 'IBM Plex Sans',sans-serif;color:#F2EDE8">Statement file</span>
+                <span style="font:400 20px/1 'IBM Plex Sans',sans-serif;color:#FF9A4D">→</span>
+              </div>
+              <span style="font:400 13px/1.45 'IBM Plex Mono',monospace;color:#FFC894">CSV · OFX · QFX · QIF</span>
+              <span style="font:400 13px/1.45 'IBM Plex Sans',sans-serif;color:#A39C95">Download from your bank's website, then pick it here.</span>
+            </div>
+            <div style="border:1px solid #24211F;background:#121110;border-radius:14px;padding:22px 20px;display:flex;flex-direction:column;gap:6px">
+              <div style="display:flex;justify-content:space-between;align-items:center;gap:12px">
+                <span style="font:500 17px/1.2 'IBM Plex Sans',sans-serif;color:#F2EDE8">Screenshot</span>
+                <span style="font:400 20px/1 'IBM Plex Sans',sans-serif;color:#5C5651">→</span>
+              </div>
+              <span style="font:400 13px/1.45 'IBM Plex Sans',sans-serif;color:#A39C95">Read on-device. You'll confirm each row it thinks it saw.</span>
+            </div>
+            <div style="border:1px solid #24211F;background:#121110;border-radius:14px;padding:22px 20px;display:flex;flex-direction:column;gap:6px">
+              <div style="display:flex;justify-content:space-between;align-items:center;gap:12px">
+                <span style="font:500 17px/1.2 'IBM Plex Sans',sans-serif;color:#F2EDE8">Type it in</span>
+                <span style="font:400 20px/1 'IBM Plex Sans',sans-serif;color:#5C5651">→</span>
+              </div>
+              <span style="font:400 13px/1.45 'IBM Plex Sans',sans-serif;color:#A39C95">For one account, or to try it before exporting anything.</span>
+            </div>
+          </div>
+          <div style="margin-top:4px;display:flex;align-items:flex-start;gap:12px;padding:16px 18px;border:1px solid #24211F;border-radius:12px">
+            <span style="width:8px;height:8px;border-radius:999px;background:#FF7A18;flex-shrink:0;margin-top:6px"></span>
+            <span style="font:400 13px/1.45 'IBM Plex Sans',sans-serif;color:#A39C95;text-wrap:pretty">We recognise 7 banks automatically. If yours isn't one, we'll show you the first rows and ask what they mean.</span>
+          </div>
+          <div style="height:48px;display:flex;align-items:center;font:400 15px/1 'IBM Plex Sans',sans-serif;color:#FF9A4D">How do I export a statement?</div>
+        </div>
+        <div style="padding:0 28px 36px;flex-shrink:0">
+          <div style="width:120px;height:4px;border-radius:999px;background:#332F2C;margin:0 auto"></div>
+        </div>
+      </div>
+      <sc-if value="{{ showAnnotations }}" hint-placeholder-val="{{ true }}">
+      <div style="display:flex;flex-direction:column;gap:6px;width:400px">
+        <span style="font:500 11px/1 'IBM Plex Mono',monospace;letter-spacing:0.12em;color:#FF7A18">03 · SOURCE</span>
+        <span style="font:400 13px/1.5 'IBM Plex Sans',sans-serif;color:#5C5651;text-wrap:pretty">Only one option is orange. The unrecognised-CSV case is named here, before it happens, so column mapping arrives as an expected step rather than a failure.</span>
+      </div>
+      </sc-if>
+    </div>
+
+    <!-- 04 CHECKPOINT -->
+    <div style="display:flex;flex-direction:column;gap:16px;width:400px;flex-shrink:0">
+      <div style="width:400px;height:890px;background:#0A0908;border:1px solid #24211F;border-radius:32px;overflow:hidden;display:flex;flex-direction:column">
+        <div style="height:48px;display:flex;align-items:center;justify-content:space-between;padding:0 28px;flex-shrink:0">
+          <span style="font:500 13px/1 'IBM Plex Sans',sans-serif;color:#F2EDE8">9:41</span>
+          <div style="display:flex;gap:6px;align-items:center">
+            <span style="width:16px;height:10px;border-radius:2px;background:#5C5651"></span>
+            <span style="width:22px;height:11px;border-radius:3px;border:1px solid #5C5651"></span>
+          </div>
+        </div>
+        <div style="height:56px;display:flex;align-items:center;gap:18px;padding:0 28px;flex-shrink:0">
+          <span style="font:400 22px/1 'IBM Plex Sans',sans-serif;color:#F2EDE8">←</span>
+          <span style="font:500 17px/1 'IBM Plex Sans',sans-serif;color:#F2EDE8">Check before importing</span>
+        </div>
+        <div style="flex:1;display:flex;flex-direction:column;padding:12px 28px 0;gap:18px;overflow:hidden">
+          <div style="display:flex;justify-content:space-between;align-items:center;gap:16px;padding:16px 18px;background:#121110;border:1px solid #24211F;border-radius:12px">
+            <div style="display:flex;flex-direction:column;gap:4px;min-width:0">
+              <span style="font:400 13px/1.3 'IBM Plex Mono',monospace;color:#A39C95">statement-jun.csv</span>
+              <span style="font:500 15px/1.3 'IBM Plex Sans',sans-serif;color:#F2EDE8">Read as: Chase Checking</span>
+            </div>
+            <span style="font:500 14px/1 'IBM Plex Sans',sans-serif;color:#FF9A4D;white-space:nowrap">Change</span>
+          </div>
+          <div style="display:flex;flex-direction:column;gap:10px">
+            <span style="font:500 11px/1 'IBM Plex Mono',monospace;letter-spacing:0.12em;text-transform:uppercase;color:#5C5651">Does this look right?</span>
+            <div style="display:flex;flex-direction:column;gap:1px;background:#24211F;border:1px solid #24211F;border-radius:12px;overflow:hidden">
+              <div style="display:flex;justify-content:space-between;align-items:center;gap:12px;padding:14px 16px;background:#121110">
+                <div style="display:flex;flex-direction:column;gap:3px;min-width:0">
+                  <span style="font:400 14px/1.3 'IBM Plex Sans',sans-serif;color:#F2EDE8">Greenfield Market</span>
+                  <span style="font:400 12px/1.3 'IBM Plex Mono',monospace;color:#5C5651">02 Jun</span>
+                </div>
+                <span style="font:500 15px/1 'IBM Plex Sans',sans-serif;color:#F2EDE8;font-variant-numeric:tabular-nums">−$63.18</span>
+              </div>
+              <div style="display:flex;justify-content:space-between;align-items:center;gap:12px;padding:14px 16px;background:#121110">
+                <div style="display:flex;flex-direction:column;gap:3px;min-width:0">
+                  <span style="font:400 14px/1.3 'IBM Plex Sans',sans-serif;color:#F2EDE8">Payroll — Halden Co</span>
+                  <span style="font:400 12px/1.3 'IBM Plex Mono',monospace;color:#5C5651">03 Jun</span>
+                </div>
+                <span style="font:500 15px/1 'IBM Plex Sans',sans-serif;color:#5FB980;font-variant-numeric:tabular-nums">+$2,410.00</span>
+              </div>
+              <div style="display:flex;justify-content:space-between;align-items:center;gap:12px;padding:14px 16px;background:#121110">
+                <div style="display:flex;flex-direction:column;gap:3px;min-width:0">
+                  <span style="font:400 14px/1.3 'IBM Plex Sans',sans-serif;color:#F2EDE8">Chordly Family</span>
+                  <span style="font:400 12px/1.3 'IBM Plex Mono',monospace;color:#5C5651">05 Jun</span>
+                </div>
+                <span style="font:500 15px/1 'IBM Plex Sans',sans-serif;color:#F2EDE8;font-variant-numeric:tabular-nums">−$16.99</span>
+              </div>
+            </div>
+            <span style="font:400 13px/1.45 'IBM Plex Sans',sans-serif;color:#A39C95;text-wrap:pretty">Spending should be negative and pay positive. If those are the wrong way round, the file was read with the wrong profile — change it above.</span>
+          </div>
+          <div style="display:flex;gap:10px">
+            <div style="flex:1;background:#121110;border:1px solid #24211F;border-radius:12px;padding:16px 18px;display:flex;flex-direction:column;gap:6px">
+              <span style="font:600 22px/1 'IBM Plex Sans',sans-serif;color:#F2EDE8;font-variant-numeric:tabular-nums">240</span>
+              <span style="font:400 12px/1.35 'IBM Plex Sans',sans-serif;color:#A39C95">rows to add</span>
+            </div>
+            <div style="flex:1;background:#121110;border:1px solid #24211F;border-radius:12px;padding:16px 18px;display:flex;flex-direction:column;gap:6px">
+              <span style="font:600 22px/1 'IBM Plex Sans',sans-serif;color:#F2EDE8;font-variant-numeric:tabular-nums">0</span>
+              <span style="font:400 12px/1.35 'IBM Plex Sans',sans-serif;color:#A39C95">already in ledger</span>
+            </div>
+            <div style="flex:1;background:#121110;border:1px solid #24211F;border-radius:12px;padding:16px 18px;display:flex;flex-direction:column;gap:6px">
+              <span style="font:600 15px/1.2 'IBM Plex Sans',sans-serif;color:#F2EDE8">14 Jan<br />30 Jun</span>
+              <span style="font:400 12px/1.35 'IBM Plex Sans',sans-serif;color:#A39C95">date range</span>
+            </div>
+          </div>
+          <div style="display:flex;align-items:flex-start;gap:12px;padding:16px 18px;border:1px dashed #332F2C;border-radius:12px">
+            <span style="width:8px;height:8px;border-radius:999px;background:#5C5651;flex-shrink:0;margin-top:6px"></span>
+            <span style="font:400 13px/1.45 'IBM Plex Sans',sans-serif;color:#A39C95;text-wrap:pretty">3 rows have no date and will be skipped. <span style="color:#FF9A4D">Show them</span></span>
+          </div>
+        </div>
+        <div style="padding:0 28px 36px;display:flex;flex-direction:column;gap:12px;flex-shrink:0">
+          <div style="height:56px;border-radius:999px;background:#FF7A18;display:flex;align-items:center;justify-content:center;font:500 16px/1 'IBM Plex Sans',sans-serif;color:#0A0908">Import 240 transactions</div>
+          <div style="height:48px;display:flex;align-items:center;justify-content:center;font:400 15px/1 'IBM Plex Sans',sans-serif;color:#A39C95">Cancel</div>
+          <div style="width:120px;height:4px;border-radius:999px;background:#332F2C;align-self:center"></div>
+        </div>
+      </div>
+      <sc-if value="{{ showAnnotations }}" hint-placeholder-val="{{ true }}">
+      <div style="display:flex;flex-direction:column;gap:6px;width:400px">
+        <span style="font:500 11px/1 'IBM Plex Mono',monospace;letter-spacing:0.12em;color:#FF7A18">04 · CHECKPOINT</span>
+        <span style="font:400 13px/1.5 'IBM Plex Sans',sans-serif;color:#5C5651;text-wrap:pretty">A real checkpoint, not a formality. Three sample rows exist so an inverted sign is visible to a human — the one import error that produces plausible, invisible damage.</span>
+      </div>
+      </sc-if>
+    </div>
+
+  </div>
+
+  <div style="display:flex;gap:56px">
+
+    <!-- 05 RESULT -->
+    <div style="display:flex;flex-direction:column;gap:16px;width:400px;flex-shrink:0">
+      <div style="width:400px;height:890px;background:#0A0908;border:1px solid #24211F;border-radius:32px;overflow:hidden;display:flex;flex-direction:column">
+        <div style="height:48px;display:flex;align-items:center;justify-content:space-between;padding:0 28px;flex-shrink:0">
+          <span style="font:500 13px/1 'IBM Plex Sans',sans-serif;color:#F2EDE8">9:41</span>
+          <div style="display:flex;gap:6px;align-items:center">
+            <span style="width:16px;height:10px;border-radius:2px;background:#5C5651"></span>
+            <span style="width:22px;height:11px;border-radius:3px;border:1px solid #5C5651"></span>
+          </div>
+        </div>
+        <div style="flex:1;display:flex;flex-direction:column;padding:72px 28px 0;gap:28px">
+          <div style="display:flex;flex-direction:column;gap:10px">
+            <span style="font:600 64px/1 'IBM Plex Sans',sans-serif;color:#F2EDE8;font-variant-numeric:tabular-nums;letter-spacing:-0.03em">240</span>
+            <span style="font:400 17px/1.4 'IBM Plex Sans',sans-serif;color:#A39C95">transactions added to Chase Checking</span>
+            <span style="font:400 13px/1.4 'IBM Plex Mono',monospace;color:#5C5651">14 Jan – 30 Jun · 3 rows skipped, no date</span>
+          </div>
+          <div style="height:1px;background:#24211F"></div>
+          <div style="display:flex;flex-direction:column;gap:14px">
+            <span style="font:500 11px/1 'IBM Plex Mono',monospace;letter-spacing:0.12em;text-transform:uppercase;color:#5C5651">While you were reading that</span>
+            <div style="display:flex;flex-direction:column;gap:1px;background:#24211F;border:1px solid #24211F;border-radius:12px;overflow:hidden">
+              <div style="display:flex;justify-content:space-between;align-items:center;padding:18px 20px;background:#121110">
+                <span style="font:400 15px/1.3 'IBM Plex Sans',sans-serif;color:#F2EDE8">Recurring payments found</span>
+                <span style="font:500 16px/1 'IBM Plex Sans',sans-serif;color:#F2EDE8;font-variant-numeric:tabular-nums">14</span>
+              </div>
+              <div style="display:flex;justify-content:space-between;align-items:center;padding:18px 20px;background:#121110">
+                <span style="font:400 15px/1.3 'IBM Plex Sans',sans-serif;color:#F2EDE8">Merchants we couldn't name</span>
+                <span style="font:500 16px/1 'IBM Plex Sans',sans-serif;color:#F2EDE8;font-variant-numeric:tabular-nums">6</span>
+              </div>
+              <div style="display:flex;justify-content:space-between;align-items:center;padding:18px 20px;background:#2A1608">
+                <span style="font:400 15px/1.3 'IBM Plex Sans',sans-serif;color:#FFC894">Things worth a look</span>
+                <span style="font:500 16px/1 'IBM Plex Sans',sans-serif;color:#FF7A18;font-variant-numeric:tabular-nums">3</span>
+              </div>
+            </div>
+          </div>
+          <div style="display:flex;align-items:flex-start;gap:12px;padding:16px 18px;border:1px solid #24211F;border-radius:12px">
+            <span style="width:8px;height:8px;border-radius:999px;background:#5FB980;flex-shrink:0;margin-top:6px"></span>
+            <span style="font:400 13px/1.45 'IBM Plex Sans',sans-serif;color:#A39C95;text-wrap:pretty">All of that was worked out on this phone. Nothing was sent anywhere.</span>
+          </div>
+        </div>
+        <div style="padding:0 28px 36px;display:flex;flex-direction:column;gap:12px;flex-shrink:0">
+          <div style="height:56px;border-radius:999px;background:#FF7A18;display:flex;align-items:center;justify-content:center;font:500 16px/1 'IBM Plex Sans',sans-serif;color:#0A0908">Show me the 3</div>
+          <div style="height:48px;display:flex;align-items:center;justify-content:center;font:400 15px/1 'IBM Plex Sans',sans-serif;color:#A39C95">Undo this import</div>
+          <div style="width:120px;height:4px;border-radius:999px;background:#332F2C;align-self:center"></div>
+        </div>
+      </div>
+      <sc-if value="{{ showAnnotations }}" hint-placeholder-val="{{ true }}">
+      <div style="display:flex;flex-direction:column;gap:6px;width:400px">
+        <span style="font:500 11px/1 'IBM Plex Mono',monospace;letter-spacing:0.12em;color:#FF7A18">05 · RESULT</span>
+        <span style="font:400 13px/1.5 'IBM Plex Sans',sans-serif;color:#5C5651;text-wrap:pretty">Counts, not congratulations. Undo sits on the success screen, at full size — the moment someone most wants it is the moment they realise the file was wrong.</span>
+      </div>
+      </sc-if>
+    </div>
+
+    <!-- 06 FIRST INSIGHT -->
+    <div style="display:flex;flex-direction:column;gap:16px;width:400px;flex-shrink:0">
+      <div style="width:400px;height:890px;background:#0A0908;border:1px solid #24211F;border-radius:32px;overflow:hidden;display:flex;flex-direction:column">
+        <div style="height:48px;display:flex;align-items:center;justify-content:space-between;padding:0 28px;flex-shrink:0">
+          <span style="font:500 13px/1 'IBM Plex Sans',sans-serif;color:#F2EDE8">9:41</span>
+          <div style="display:flex;gap:6px;align-items:center">
+            <span style="width:16px;height:10px;border-radius:2px;background:#5C5651"></span>
+            <span style="width:22px;height:11px;border-radius:3px;border:1px solid #5C5651"></span>
+          </div>
+        </div>
+        <div style="height:56px;display:flex;align-items:center;justify-content:space-between;padding:0 28px;flex-shrink:0">
+          <span style="font:500 17px/1 'IBM Plex Sans',sans-serif;color:#F2EDE8">Worth a look</span>
+          <span style="font:400 13px/1 'IBM Plex Mono',monospace;color:#5C5651">1 of 3</span>
+        </div>
+        <div style="flex:1;display:flex;flex-direction:column;padding:12px 28px 0;gap:16px">
+          <div style="background:#2A1608;border:1px solid #B85A14;border-radius:16px;padding:24px 22px;display:flex;flex-direction:column;gap:18px">
+            <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:14px">
+              <span style="font:600 26px/1.15 'IBM Plex Sans',sans-serif;color:#F2EDE8;text-wrap:pretty">You're paying for 2 music services</span>
+              <span style="font:500 10px/1 'IBM Plex Mono',monospace;letter-spacing:0.08em;color:#0A0908;background:#FF7A18;padding:6px 8px;border-radius:3px;white-space:nowrap">CERTAIN</span>
+            </div>
+            <div style="display:flex;flex-direction:column;gap:8px">
+              <div style="display:flex;justify-content:space-between;font:400 15px/1.4 'IBM Plex Sans',sans-serif;color:#FFC894">
+                <span>Chordly Family · monthly</span><span style="font-variant-numeric:tabular-nums">−$16.99</span>
+              </div>
+              <div style="display:flex;justify-content:space-between;font:400 15px/1.4 'IBM Plex Sans',sans-serif;color:#FFC894">
+                <span>Tunebox Premium · monthly</span><span style="font-variant-numeric:tabular-nums">−$11.99</span>
+              </div>
+            </div>
+            <div style="height:1px;background:#4A2409"></div>
+            <div style="display:flex;justify-content:space-between;align-items:flex-end;gap:16px">
+              <span style="font:400 13px/1.4 'IBM Plex Sans',sans-serif;color:#A39C95;max-width:170px;text-wrap:pretty">If you kept the cheaper one</span>
+              <span style="font:600 34px/1 'IBM Plex Sans',sans-serif;color:#FF7A18;font-variant-numeric:tabular-nums;letter-spacing:-0.02em">$204<span style="font-size:17px;font-weight:500">/yr</span></span>
+            </div>
+            <div style="display:flex;flex-direction:column;gap:10px">
+              <div style="height:52px;border-radius:999px;background:#FF7A18;display:flex;align-items:center;justify-content:center;font:500 15px/1 'IBM Plex Sans',sans-serif;color:#0A0908">Compare them</div>
+              <div style="height:52px;border-radius:999px;border:1px solid #B85A14;display:flex;align-items:center;justify-content:center;font:500 15px/1 'IBM Plex Sans',sans-serif;color:#FFC894">I want both</div>
+            </div>
+          </div>
+          <div style="background:#121110;border:1px solid #24211F;border-radius:14px;padding:18px 20px;display:flex;justify-content:space-between;align-items:center;gap:14px">
+            <div style="display:flex;flex-direction:column;gap:5px;min-width:0">
+              <span style="font:500 15px/1.3 'IBM Plex Sans',sans-serif;color:#F2EDE8">Chordly went up in May</span>
+              <span style="font:400 13px/1.35 'IBM Plex Sans',sans-serif;color:#A39C95">$14.99 → $16.99 on 15 May</span>
+            </div>
+            <span style="font:500 16px/1 'IBM Plex Sans',sans-serif;color:#FF7A18;font-variant-numeric:tabular-nums;white-space:nowrap">$24/yr</span>
+          </div>
+          <div style="background:#121110;border:1px dashed #332F2C;border-radius:14px;padding:18px 20px;display:flex;justify-content:space-between;align-items:center;gap:14px">
+            <div style="display:flex;flex-direction:column;gap:5px;min-width:0">
+              <span style="font:500 15px/1.3 'IBM Plex Sans',sans-serif;color:#F2EDE8">Northgate Parking, maybe monthly</span>
+              <span style="font:400 13px/1.35 'IBM Plex Sans',sans-serif;color:#A39C95">4 charges, 27–31 days apart</span>
+            </div>
+            <span style="font:500 10px/1 'IBM Plex Mono',monospace;letter-spacing:0.08em;color:#A39C95;border:1px solid #332F2C;padding:6px 8px;border-radius:3px;white-space:nowrap">61%</span>
+          </div>
+          <div style="height:48px;display:flex;align-items:center;font:400 14px/1 'IBM Plex Sans',sans-serif;color:#FF9A4D">Why do we think this?</div>
+        </div>
+        <div style="padding:0 28px 36px;flex-shrink:0">
+          <div style="width:120px;height:4px;border-radius:999px;background:#332F2C;margin:0 auto"></div>
+        </div>
+      </div>
+      <sc-if value="{{ showAnnotations }}" hint-placeholder-val="{{ true }}">
+      <div style="display:flex;flex-direction:column;gap:6px;width:400px">
+        <span style="font:500 11px/1 'IBM Plex Mono',monospace;letter-spacing:0.12em;color:#FF7A18">06 · THE PAYOFF</span>
+        <span style="font:400 13px/1.5 'IBM Plex Sans',sans-serif;color:#5C5651;text-wrap:pretty">Confidence is drawn, not labelled twice: solid fill for certain, hairline for known, dashed and grey for a 61% guess. "I want both" is a first-class button — dismissal must not feel like a failure.</span>
+      </div>
+      </sc-if>
+    </div>
+
+    <!-- 07 SAVINGS -->
+    <div style="display:flex;flex-direction:column;gap:16px;width:400px;flex-shrink:0">
+      <div style="width:400px;height:890px;background:#0A0908;border:1px solid #24211F;border-radius:32px;overflow:hidden;display:flex;flex-direction:column">
+        <div style="height:48px;display:flex;align-items:center;justify-content:space-between;padding:0 28px;flex-shrink:0">
+          <span style="font:500 13px/1 'IBM Plex Sans',sans-serif;color:#F2EDE8">9:41</span>
+          <div style="display:flex;gap:6px;align-items:center">
+            <span style="width:16px;height:10px;border-radius:2px;background:#5C5651"></span>
+            <span style="width:22px;height:11px;border-radius:3px;border:1px solid #5C5651"></span>
+          </div>
+        </div>
+        <div style="height:56px;display:flex;align-items:center;justify-content:space-between;padding:0 28px;flex-shrink:0">
+          <span style="font:500 17px/1 'IBM Plex Sans',sans-serif;color:#F2EDE8">Savings</span>
+          <span style="font:400 18px/1 'IBM Plex Sans',sans-serif;color:#A39C95">⚙</span>
+        </div>
+        <div style="flex:1;display:flex;flex-direction:column;padding:8px 28px 0;gap:18px;overflow:hidden">
+          <div style="display:flex;flex-direction:column;gap:8px">
+            <span style="font:600 46px/1 'IBM Plex Sans',sans-serif;color:#FF7A18;font-variant-numeric:tabular-nums;letter-spacing:-0.02em">$318<span style="font-size:22px;font-weight:500;color:#FFC894">/yr</span></span>
+            <span style="font:400 14px/1.45 'IBM Plex Sans',sans-serif;color:#A39C95;text-wrap:pretty">Overlap and price rises we can see in 6 months of Chase Checking. Not money saved yet.</span>
+          </div>
+          <div style="display:flex;flex-direction:column;gap:10px">
+            <span style="font:500 11px/1 'IBM Plex Mono',monospace;letter-spacing:0.12em;text-transform:uppercase;color:#5C5651">3 findings</span>
+            <div style="background:#121110;border:1px solid #B85A14;border-radius:14px;padding:18px 20px;display:flex;justify-content:space-between;align-items:center;gap:14px">
+              <div style="display:flex;flex-direction:column;gap:5px;min-width:0">
+                <span style="font:500 15px/1.3 'IBM Plex Sans',sans-serif;color:#F2EDE8">2 music services</span>
+                <span style="font:400 12px/1.35 'IBM Plex Mono',monospace;color:#5C5651">duplicate · certain</span>
+              </div>
+              <span style="font:500 16px/1 'IBM Plex Sans',sans-serif;color:#FF7A18;font-variant-numeric:tabular-nums">$204/yr</span>
+            </div>
+            <div style="background:#121110;border:1px solid #24211F;border-radius:14px;padding:18px 20px;display:flex;justify-content:space-between;align-items:center;gap:14px">
+              <div style="display:flex;flex-direction:column;gap:5px;min-width:0">
+                <span style="font:500 15px/1.3 'IBM Plex Sans',sans-serif;color:#F2EDE8">Chordly, up $2.00</span>
+                <span style="font:400 12px/1.35 'IBM Plex Mono',monospace;color:#5C5651">price rise · 15 May</span>
+              </div>
+              <span style="font:500 16px/1 'IBM Plex Sans',sans-serif;color:#FF7A18;font-variant-numeric:tabular-nums">$24/yr</span>
+            </div>
+            <div style="background:#121110;border:1px solid #24211F;border-radius:14px;padding:18px 20px;display:flex;justify-content:space-between;align-items:center;gap:14px">
+              <div style="display:flex;flex-direction:column;gap:5px;min-width:0">
+                <span style="font:500 15px/1.3 'IBM Plex Sans',sans-serif;color:#F2EDE8">Kestrel Gym, unused since Feb</span>
+                <span style="font:400 12px/1.35 'IBM Plex Mono',monospace;color:#5C5651">still charging · likely</span>
+              </div>
+              <span style="font:500 16px/1 'IBM Plex Sans',sans-serif;color:#FF7A18;font-variant-numeric:tabular-nums">$90/yr</span>
+            </div>
+          </div>
+          <div style="display:flex;justify-content:space-between;align-items:center;gap:14px;padding:18px 20px;border:1px solid #24211F;border-radius:14px">
+            <span style="font:500 15px/1.3 'IBM Plex Sans',sans-serif;color:#F2EDE8">Try cancelling things</span>
+            <span style="font:400 18px/1 'IBM Plex Sans',sans-serif;color:#FF9A4D">→</span>
+          </div>
+          <div style="display:flex;flex-direction:column;gap:10px">
+            <div style="display:flex;justify-content:space-between;align-items:baseline">
+              <span style="font:500 11px/1 'IBM Plex Mono',monospace;letter-spacing:0.12em;text-transform:uppercase;color:#5C5651">Subscriptions · 14</span>
+              <span style="font:400 13px/1 'IBM Plex Sans',sans-serif;color:#FF9A4D">All</span>
+            </div>
+            <div style="display:flex;flex-direction:column;gap:1px;background:#24211F;border:1px solid #24211F;border-radius:12px;overflow:hidden">
+              <div style="display:flex;justify-content:space-between;align-items:center;padding:15px 18px;background:#121110">
+                <span style="font:400 14px/1.3 'IBM Plex Sans',sans-serif;color:#F2EDE8">Chordly Family</span>
+                <span style="font:400 14px/1 'IBM Plex Sans',sans-serif;color:#F2EDE8;font-variant-numeric:tabular-nums">−$16.99 · monthly</span>
+              </div>
+              <div style="display:flex;justify-content:space-between;align-items:center;padding:15px 18px;background:#121110">
+                <span style="font:400 14px/1.3 'IBM Plex Sans',sans-serif;color:#F2EDE8">Halden Fibre</span>
+                <span style="font:400 14px/1 'IBM Plex Sans',sans-serif;color:#F2EDE8;font-variant-numeric:tabular-nums">−$54.00 · monthly</span>
+              </div>
+              <div style="display:flex;justify-content:space-between;align-items:center;padding:15px 18px;background:#121110">
+                <span style="font:400 14px/1.3 'IBM Plex Sans',sans-serif;color:#F2EDE8">Orbit Cloud 2TB</span>
+                <span style="font:400 14px/1 'IBM Plex Sans',sans-serif;color:#F2EDE8;font-variant-numeric:tabular-nums">−$9.99 · every 4 wks</span>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div style="flex-shrink:0;padding:12px 20px 20px;background:#121110;border-top:1px solid #24211F;display:flex;align-items:center;justify-content:space-between;gap:6px">
+          <span style="font:400 12px/1 'IBM Plex Sans',sans-serif;color:#A39C95;padding:14px 10px">Home</span>
+          <span style="font:500 12px/1 'IBM Plex Sans',sans-serif;color:#0A0908;background:#FF7A18;padding:14px 18px;border-radius:999px">Savings</span>
+          <span style="font:400 12px/1 'IBM Plex Sans',sans-serif;color:#A39C95;padding:14px 10px">Budget</span>
+          <span style="font:400 12px/1 'IBM Plex Sans',sans-serif;color:#A39C95;padding:14px 10px">Accounts</span>
+          <span style="width:44px;height:44px;border-radius:14px;background:#FF7A18;display:flex;align-items:center;justify-content:center;font:400 24px/1 'IBM Plex Sans',sans-serif;color:#0A0908">+</span>
+        </div>
+      </div>
+      <sc-if value="{{ showAnnotations }}" hint-placeholder-val="{{ true }}">
+      <div style="display:flex;flex-direction:column;gap:6px;width:400px">
+        <span style="font:500 11px/1 'IBM Plex Mono',monospace;letter-spacing:0.12em;color:#FF7A18">07 · SAVINGS HUB</span>
+        <span style="font:400 13px/1.5 'IBM Plex Sans',sans-serif;color:#5C5651;text-wrap:pretty">Navigation appears only after there is data to navigate. The headline number is framed as current annualised overlap and explicitly says it is not money saved yet. Import is the orange square, not a tab.</span>
+      </div>
+      </sc-if>
+    </div>
+
+    <!-- 08 DUPLICATE DETAIL -->
+    <div style="display:flex;flex-direction:column;gap:16px;width:400px;flex-shrink:0">
+      <div style="width:400px;height:890px;background:#0A0908;border:1px solid #24211F;border-radius:32px;overflow:hidden;display:flex;flex-direction:column">
+        <div style="height:48px;display:flex;align-items:center;justify-content:space-between;padding:0 28px;flex-shrink:0">
+          <span style="font:500 13px/1 'IBM Plex Sans',sans-serif;color:#F2EDE8">9:41</span>
+          <div style="display:flex;gap:6px;align-items:center">
+            <span style="width:16px;height:10px;border-radius:2px;background:#5C5651"></span>
+            <span style="width:22px;height:11px;border-radius:3px;border:1px solid #5C5651"></span>
+          </div>
+        </div>
+        <div style="height:56px;display:flex;align-items:center;gap:18px;padding:0 28px;flex-shrink:0">
+          <span style="font:400 22px/1 'IBM Plex Sans',sans-serif;color:#F2EDE8">←</span>
+          <span style="font:500 17px/1 'IBM Plex Sans',sans-serif;color:#F2EDE8">2 music services</span>
+        </div>
+        <div style="flex:1;display:flex;flex-direction:column;padding:8px 28px 0;gap:18px;overflow:hidden">
+          <p style="margin:0;font:400 15px/1.5 'IBM Plex Sans',sans-serif;color:#A39C95;text-wrap:pretty">Both charged in every month since January. Both are music streaming in our catalogue.</p>
+          <div style="display:flex;flex-direction:column;gap:12px">
+            <div style="background:#121110;border:1px solid #24211F;border-radius:14px;padding:18px 20px;display:flex;flex-direction:column;gap:12px">
+              <div style="display:flex;justify-content:space-between;align-items:baseline">
+                <span style="font:500 16px/1.2 'IBM Plex Sans',sans-serif;color:#F2EDE8">Chordly Family</span>
+                <span style="font:500 15px/1 'IBM Plex Sans',sans-serif;color:#F2EDE8;font-variant-numeric:tabular-nums">−$16.99</span>
+              </div>
+              <div style="display:flex;align-items:flex-end;gap:6px;height:44px">
+                <div style="flex:1;height:28px;background:#332F2C;border-radius:2px"></div>
+                <div style="flex:1;height:28px;background:#332F2C;border-radius:2px"></div>
+                <div style="flex:1;height:28px;background:#332F2C;border-radius:2px"></div>
+                <div style="flex:1;height:28px;background:#332F2C;border-radius:2px"></div>
+                <div style="flex:1;height:36px;background:#B85A14;border-radius:2px"></div>
+                <div style="flex:1;height:36px;background:#FF7A18;border-radius:2px"></div>
+              </div>
+              <div style="display:flex;justify-content:space-between;font:400 11px/1 'IBM Plex Mono',monospace;color:#5C5651">
+                <span>Jan</span><span>$14.99 → $16.99 on 15 May</span><span>Jun</span>
+              </div>
+            </div>
+            <div style="background:#121110;border:1px solid #24211F;border-radius:14px;padding:18px 20px;display:flex;flex-direction:column;gap:12px">
+              <div style="display:flex;justify-content:space-between;align-items:baseline">
+                <span style="font:500 16px/1.2 'IBM Plex Sans',sans-serif;color:#F2EDE8">Tunebox Premium</span>
+                <span style="font:500 15px/1 'IBM Plex Sans',sans-serif;color:#F2EDE8;font-variant-numeric:tabular-nums">−$11.99</span>
+              </div>
+              <div style="display:flex;align-items:flex-end;gap:6px;height:44px">
+                <div style="flex:1;height:24px;background:#332F2C;border-radius:2px"></div>
+                <div style="flex:1;height:24px;background:#332F2C;border-radius:2px"></div>
+                <div style="flex:1;height:24px;background:#332F2C;border-radius:2px"></div>
+                <div style="flex:1;height:24px;background:#332F2C;border-radius:2px"></div>
+                <div style="flex:1;height:24px;background:#332F2C;border-radius:2px"></div>
+                <div style="flex:1;height:24px;background:#332F2C;border-radius:2px"></div>
+              </div>
+              <div style="display:flex;justify-content:space-between;font:400 11px/1 'IBM Plex Mono',monospace;color:#5C5651">
+                <span>Jan</span><span>unchanged since Jan</span><span>Jun</span>
+              </div>
+            </div>
+          </div>
+          <div style="background:#050403;border:1px solid #24211F;border-radius:14px;padding:20px;display:flex;flex-direction:column;gap:10px">
+            <span style="font:500 11px/1 'IBM Plex Mono',monospace;letter-spacing:0.12em;text-transform:uppercase;color:#5C5651">The maths</span>
+            <div style="display:flex;justify-content:space-between;font:400 13px/1.6 'IBM Plex Mono',monospace;color:#A39C95">
+              <span>$16.99 × 12</span><span style="color:#F2EDE8">$203.88</span>
+            </div>
+            <div style="display:flex;justify-content:space-between;font:400 13px/1.6 'IBM Plex Mono',monospace;color:#A39C95">
+              <span>$11.99 × 12</span><span style="color:#F2EDE8">$143.88</span>
+            </div>
+            <div style="height:1px;background:#24211F;margin:2px 0"></div>
+            <div style="display:flex;justify-content:space-between;font:500 13px/1.6 'IBM Plex Mono',monospace;color:#FFC894">
+              <span>drop the dearer</span><span style="color:#FF7A18">$203.88/yr</span>
+            </div>
+            <span style="font:400 12px/1.5 'IBM Plex Sans',sans-serif;color:#5C5651;text-wrap:pretty">Shown as $204/yr elsewhere. Tap any figure to see the 12 charges behind it.</span>
+          </div>
+        </div>
+        <div style="padding:16px 28px 36px;display:flex;flex-direction:column;gap:12px;flex-shrink:0">
+          <div style="height:56px;border-radius:999px;background:#FF7A18;display:flex;align-items:center;justify-content:center;font:500 16px/1 'IBM Plex Sans',sans-serif;color:#0A0908">Mark as handled</div>
+          <div style="height:48px;display:flex;align-items:center;justify-content:center;font:400 15px/1 'IBM Plex Sans',sans-serif;color:#A39C95">I want both — stop showing this</div>
+          <div style="width:120px;height:4px;border-radius:999px;background:#332F2C;align-self:center"></div>
+        </div>
+      </div>
+      <sc-if value="{{ showAnnotations }}" hint-placeholder-val="{{ true }}">
+      <div style="display:flex;flex-direction:column;gap:6px;width:400px">
+        <span style="font:500 11px/1 'IBM Plex Mono',monospace;letter-spacing:0.12em;color:#FF7A18">08 · TRACEABLE</span>
+        <span style="font:400 13px/1.5 'IBM Plex Sans',sans-serif;color:#5C5651;text-wrap:pretty">Every number the app asserts is shown being derived, including the rounding it does elsewhere. Charge history is bars, not a chart — orange marks only the charges that changed.</span>
+      </div>
+      </sc-if>
+    </div>
+
+  </div>
+
+  <sc-if value="{{ showOpenQuestions }}" hint-placeholder-val="{{ true }}">
+  <div style="max-width:1800px;display:flex;flex-direction:column;gap:20px;margin-top:16px">
+    <div style="display:flex;align-items:baseline;gap:16px">
+      <span style="font:500 11px/1 'IBM Plex Mono',monospace;letter-spacing:0.14em;text-transform:uppercase;color:#A39C95">Decisions this flow takes</span>
+      <span style="flex:1;height:1px;background:#24211F"></span>
+    </div>
+    <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:16px">
+      <div style="background:#121110;border:1px solid #24211F;border-radius:3px;padding:20px;display:flex;flex-direction:column;gap:10px">
+        <span style="font:500 13px/1.3 'IBM Plex Sans',sans-serif;color:#FF7A18">Privacy is loud, then quiet</span>
+        <span style="font:400 13px/1.55 'IBM Plex Sans',sans-serif;color:#A39C95;text-wrap:pretty">Front and centre once, before the first file, then it recedes to a line on the result screen and a settings entry. Repeating it every screen would read as protesting too much.</span>
+      </div>
+      <div style="background:#121110;border:1px solid #24211F;border-radius:3px;padding:20px;display:flex;flex-direction:column;gap:10px">
+        <span style="font:500 13px/1.3 'IBM Plex Sans',sans-serif;color:#FF7A18">Savings framed as current overlap</span>
+        <span style="font:400 13px/1.55 'IBM Plex Sans',sans-serif;color:#A39C95;text-wrap:pretty">"$318/yr visible in what you've imported", not "found so far". Cumulative is more motivating and easier to overstate; this app can't afford a number it can't defend.</span>
+      </div>
+      <div style="background:#121110;border:1px solid #24211F;border-radius:3px;padding:20px;display:flex;flex-direction:column;gap:10px">
+        <span style="font:500 13px/1.3 'IBM Plex Sans',sans-serif;color:#FF7A18">Low confidence still shows</span>
+        <span style="font:400 13px/1.55 'IBM Plex Sans',sans-serif;color:#A39C95;text-wrap:pretty">Below ~70% a finding loses its fill, its accent and its buttons — it becomes an observation with a percentage, ranked last. It never gets a notification.</span>
+      </div>
+      <div style="background:#121110;border:1px solid #24211F;border-radius:3px;padding:20px;display:flex;flex-direction:column;gap:10px">
+        <span style="font:500 13px/1.3 'IBM Plex Sans',sans-serif;color:#FF7A18">Dismissal is a preference</span>
+        <span style="font:400 13px/1.55 'IBM Plex Sans',sans-serif;color:#A39C95;text-wrap:pretty">"I want both" reads as a choice, not a delete. It hides the pairing permanently but keeps both subscriptions in the list and their money in the totals.</span>
+      </div>
+    </div>
+    <div style="display:flex;flex-wrap:wrap;gap:12px;margin-top:4px">
+      <span style="font:400 13px/1.5 'IBM Plex Sans',sans-serif;color:#5C5651;padding:12px 16px;border:1px dashed #332F2C;border-radius:3px">Still open: what Home is</span>
+      <span style="font:400 13px/1.5 'IBM Plex Sans',sans-serif;color:#5C5651;padding:12px 16px;border:1px dashed #332F2C;border-radius:3px">Still open: column mapping for unrecognised CSVs</span>
+      <span style="font:400 13px/1.5 'IBM Plex Sans',sans-serif;color:#5C5651;padding:12px 16px;border:1px dashed #332F2C;border-radius:3px">Still open: one account or detect per import</span>
+    </div>
+  </div>
+  </sc-if>
+
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{&quot;showAnnotations&quot;:{&quot;editor&quot;:&quot;boolean&quot;,&quot;default&quot;:true,&quot;tsType&quot;:&quot;boolean&quot;,&quot;section&quot;:&quot;Review&quot;},&quot;showOpenQuestions&quot;:{&quot;editor&quot;:&quot;boolean&quot;,&quot;default&quot;:true,&quot;tsType&quot;:&quot;boolean&quot;,&quot;section&quot;:&quot;Review&quot;}}">
+class Component extends DCLogic {
+  renderVals() {
+    return {
+      showAnnotations: this.props.showAnnotations ?? true,
+      showOpenQuestions: this.props.showOpenQuestions ?? true,
+    };
+  }
+}
+</script>
+</body>
+</html>

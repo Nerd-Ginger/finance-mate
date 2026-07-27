@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+    Only the handful of colours the platform needs before Compose is running.
+    The design system itself lives in ui/theme/Colour.kt — this is not a second
+    source of truth, and nothing should be added here that Compose could own.
+-->
+<resources>
+    <color name="canvas">#0A0908</color>
+    <color name="orange">#FF7A18</color>
+</resources>
