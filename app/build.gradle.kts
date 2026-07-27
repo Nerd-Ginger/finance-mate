@@ -1,6 +1,8 @@
 plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.compose)
+    // Renders Compose to PNG on the JVM. See ScreenshotTest for why.
+    alias(libs.plugins.roborazzi)
 }
 
 android {
@@ -36,6 +38,12 @@ android {
         sourceCompatibility = JavaVersion.VERSION_17
         targetCompatibility = JavaVersion.VERSION_17
         isCoreLibraryDesugaringEnabled = true
+    }
+
+    testOptions {
+        unitTests {
+            isIncludeAndroidResources = true
+        }
     }
 
     packaging {
@@ -94,6 +102,17 @@ dependencies {
 
     testImplementation(libs.junit)
     testImplementation(libs.kotest.assertions)
+    // Screenshot testing. Renders Compose on the JVM via Robolectric, so every
+    // screen can be reviewed without installing anything.
+    testImplementation(libs.robolectric)
+    testImplementation(libs.roborazzi)
+    testImplementation(libs.roborazzi.compose)
+    testImplementation(libs.roborazzi.junit.rule)
+    testImplementation(libs.androidx.test.junit)
+    testImplementation(platform(libs.compose.bom))
+    testImplementation(libs.compose.ui.test.junit4)
+    testImplementation(libs.compose.ui.tooling)
+
     androidTestImplementation(libs.androidx.test.junit)
     androidTestImplementation(libs.androidx.espresso.core)
     androidTestImplementation(platform(libs.compose.bom))

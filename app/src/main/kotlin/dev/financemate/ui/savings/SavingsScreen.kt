@@ -222,11 +222,24 @@ private fun DuplicateCard(finding: DuplicateSubscriptionFinding) {
     }
 }
 
+/**
+ * Rendered with the hairline treatment rather than the filled one.
+ *
+ * Both duplicates and price rises are certain, so this is not about confidence
+ * — it is the orange budget. The palette allows roughly 5% of a screen, and
+ * filling every finding card blows straight through that, at which point orange
+ * stops meaning anything and the whole signalling system goes with it.
+ *
+ * The split is also a real distinction rather than a cosmetic one: a duplicate
+ * is money you can recover by acting, a price rise is something that already
+ * happened and is mostly information. The louder treatment goes to the one with
+ * an action attached.
+ */
 @Composable
 private fun PriceRiseCard(finding: PriceChangeFinding) {
     val colours = FinanceMate.colours
 
-    FindingCard(confidence = FindingConfidence.CERTAIN) {
+    FindingCard(confidence = FindingConfidence.LIKELY) {
         Text(
             text = finding.merchantKey.value,
             style = MaterialTheme.typography.titleLarge,
@@ -254,7 +267,11 @@ private fun PriceRiseCard(finding: PriceChangeFinding) {
 private fun UntaggedPrompt(count: Int) {
     FindingCard(confidence = FindingConfidence.UNCERTAIN) {
         Text(
-            text = "$count recurring payments aren't recognised",
+            text = if (count == 1) {
+                "1 recurring payment isn't recognised"
+            } else {
+                "$count recurring payments aren't recognised"
+            },
             style = MaterialTheme.typography.titleMedium,
             color = MaterialTheme.colorScheme.onSurface,
         )
@@ -368,7 +385,11 @@ private fun CentredMessage(message: String, showSpinner: Boolean = false) {
             verticalArrangement = Arrangement.spacedBy(20.dp),
         ) {
             if (showSpinner) {
-                CircularProgressIndicator(color = FinanceMate.colours.foundMoney)
+                // Neutral, not orange. Orange is reserved for money the app
+                // found and for the one action on a screen; a spinner is
+                // neither, and spending the accent on "please wait" cheapens it
+                // everywhere else.
+                CircularProgressIndicator(color = MaterialTheme.colorScheme.onSurfaceVariant)
             }
             Text(
                 text = message,
