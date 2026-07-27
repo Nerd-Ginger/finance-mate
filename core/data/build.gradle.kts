@@ -66,6 +66,9 @@ dependencies {
     testImplementation(libs.robolectric)
     testImplementation(libs.androidx.test.junit)
     testImplementation(libs.room.testing)
+    // Reads Room's exported schema JSON, so migrations can be checked against
+    // what Room actually generated. Parsing only - no serialization plugin.
+    testImplementation(libs.kotlinx.serialization.json)
 
     androidTestImplementation(libs.androidx.test.junit)
     androidTestImplementation(libs.room.testing)

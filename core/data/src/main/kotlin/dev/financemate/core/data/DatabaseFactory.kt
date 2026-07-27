@@ -42,6 +42,7 @@ public object DatabaseFactory {
         )
             .openHelperFactory(SupportOpenHelperFactory(passphrase))
             .addCallback(ForeignKeyEnforcement)
+            .addMigrations(*Migrations.ALL)
             // No fallbackToDestructiveMigration, deliberately. Room's destructive
             // fallback silently drops every table when a migration is missing.
             // For a ledger the user cannot reconstruct — banks do not keep
