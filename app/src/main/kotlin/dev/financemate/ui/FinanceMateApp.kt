@@ -213,6 +213,8 @@ private fun AppScaffold(
                             importViewModel.onFilePicked(container.appContext, uri)
                         },
                         onConfirm = { preview -> importViewModel.confirm(preview) },
+                        onChangeAccount = { importViewModel.changeAccount(it) },
+                        onUndo = { batchId -> importViewModel.undo(batchId) },
                         onReset = { importViewModel.reset() },
                         onDone = {
                             importViewModel.reset()

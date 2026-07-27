@@ -3,11 +3,17 @@ package dev.financemate.ui.import
 import android.content.Context
 import android.net.Uri
 import android.provider.OpenableColumns
+import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dev.financemate.AppContainer
+import dev.financemate.core.data.import.ImportCheckpoint
+import dev.financemate.core.data.import.ImportCheckpointBuilder
+import dev.financemate.core.data.import.ImportOutcome
+import dev.financemate.core.data.mapper.toDomain
 import dev.financemate.core.data.mapper.toEntity
 import dev.financemate.core.model.Account
+import dev.financemate.core.model.ImportBatchId
 import dev.financemate.core.model.AccountId
 import dev.financemate.core.model.AccountType
 import dev.financemate.core.model.ImportSource
@@ -26,6 +32,7 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import java.time.format.DateTimeFormatter
 import java.util.UUID
 
 /**
@@ -52,9 +59,17 @@ public class ImportViewModel(
     public fun onFilePicked(context: Context, uri: Uri) {
         viewModelScope.launch {
             _state.update { ImportUiState.Parsing }
-            runCatching { readAndParse(context, uri) }
+            runCatching {
+                val parsed = readAndParse(context, uri)
+                // Parsing and forecasting are one step from the user's point of
+                // view: they picked a file and want to know what it will do.
+                // Showing a row count first and the real numbers a moment later
+                // would just be two loading states.
+                checkpointFor(parsed)
+            }
                 .onSuccess { preview -> _state.update { preview } }
                 .onFailure { error ->
+                    logWhereItFailed(error)
                     _state.update {
                         ImportUiState.Failed(
                             "Could not read that file (${error.javaClass.simpleName}). " +
@@ -65,30 +80,39 @@ public class ImportViewModel(
         }
     }
 
+    /**
+     * Re-reads the file against a different account.
+     *
+     * The counts have to be recomputed, not adjusted: dedup fingerprints include
+     * the account, so the same rows can be entirely new in one account and
+     * entirely duplicate in another. Keeping the old numbers would make the
+     * checkpoint lie in precisely the situation the user changed the account to
+     * resolve.
+     */
+    public fun changeAccount(account: Account) {
+        val current = _state.value as? ImportUiState.Preview ?: return
+        viewModelScope.launch {
+            _state.update { current.copy(account = account, checkpoint = null) }
+            runCatching {
+                ImportCheckpointBuilder(container.database()).build(account.id, current.parseResult)
+            }.onSuccess { checkpoint ->
+                _state.update { current.copy(account = account, checkpoint = checkpoint) }
+            }
+        }
+    }
+
     public fun confirm(preview: ImportUiState.Preview) {
+        val accountId = preview.account?.id ?: return
         viewModelScope.launch {
             _state.update { ImportUiState.Importing }
             runCatching {
-                val database = container.database()
-
-                // First import creates a holding account. Per-account selection
-                // arrives with the accounts screen; until then everything lands
-                // somewhere real rather than being silently dropped.
-                val accountId = ensureDefaultAccount(database)
-
                 container.importPipeline().import(
                     accountId = accountId,
                     parseResult = preview.parseResult,
                     fileName = preview.fileName,
                 )
             }.onSuccess { outcome ->
-                _state.update {
-                    ImportUiState.Done(
-                        imported = outcome.importedCount,
-                        duplicates = outcome.duplicateCount,
-                        isLikelyReimport = outcome.batch.isLikelyReimport,
-                    )
-                }
+                _state.update { doneStateFor(preview, outcome) }
             }.onFailure { error ->
                 _state.update {
                     ImportUiState.Failed("Import failed (${error.javaClass.simpleName}).")
@@ -97,15 +121,113 @@ public class ImportViewModel(
         }
     }
 
+    /**
+     * Removes the batch this import just wrote.
+     *
+     * Returns to the source picker rather than to the checkpoint. Undo is
+     * pressed because something about the file was wrong, and offering to import
+     * the same wrong file again would be the least useful next step available.
+     */
+    public fun undo(batchId: ImportBatchId) {
+        viewModelScope.launch {
+            runCatching { container.importPipeline().undo(batchId) }
+                .onSuccess { _state.update { ImportUiState.Idle } }
+                .onFailure { error ->
+                    _state.update {
+                        ImportUiState.Failed("Could not undo (${error.javaClass.simpleName}).")
+                    }
+                }
+        }
+    }
+
     public fun reset() {
         _state.update { ImportUiState.Idle }
     }
 
-    private suspend fun ensureDefaultAccount(
-        database: dev.financemate.core.data.FinanceMateDatabase,
-    ): AccountId {
-        database.accountDao().all().firstOrNull()?.let { return AccountId(it.id) }
+    private suspend fun doneStateFor(
+        preview: ImportUiState.Preview,
+        outcome: ImportOutcome,
+    ): ImportUiState.Done {
+        val report = container.savingsRepository().analyse()
+        val untagged = container.savingsRepository().untaggedRecurringMerchants()
 
+        return ImportUiState.Done(
+            imported = outcome.importedCount,
+            duplicates = outcome.duplicateCount,
+            isLikelyReimport = outcome.batch.isLikelyReimport,
+            accountName = preview.account?.displayName ?: "your ledger",
+            batchId = outcome.batch.id,
+            subtitle = subtitleFor(preview),
+            recurringFound = report.subscriptions.size,
+            unnamedMerchants = untagged.size,
+            // What the user is actually here for: things the app noticed that
+            // they had not. Duplicates and price rises both qualify; a merchant
+            // it simply could not name does not, which is why that count sits in
+            // its own neutral row rather than being folded in here.
+            worthALook = report.duplicates.size + report.priceIncreases.size,
+        )
+    }
+
+    private fun subtitleFor(preview: ImportUiState.Preview): String? {
+        val checkpoint = preview.checkpoint ?: return null
+        val parts = buildList {
+            val from = checkpoint.earliest
+            val to = checkpoint.latest
+            if (from != null && to != null) {
+                add(if (from == to) from.format(SUBTITLE_DATE) else "${from.format(SUBTITLE_DATE)} – ${to.format(SUBTITLE_DATE)}")
+            }
+            when (checkpoint.skipped.size) {
+                0 -> Unit
+                1 -> add("1 row skipped")
+                else -> add("${checkpoint.skipped.size} rows skipped")
+            }
+        }
+        return parts.takeIf { it.isNotEmpty() }?.joinToString(" · ")
+    }
+
+    /**
+     * Logs *where* an import failed, never *what* it was reading.
+     *
+     * Exception messages are excluded deliberately. A parser message can quote
+     * the offending row, and logcat is world-readable to anyone with a cable and
+     * shipped to crash reporters — precisely the destinations the redaction gate
+     * exists to keep statement content away from. Class name and stack frames
+     * are enough to locate a bug and carry none of the user's money.
+     */
+    private fun logWhereItFailed(error: Throwable) {
+        val frames = error.stackTrace.take(STACK_FRAMES).joinToString(separator = " <- ") {
+            "${it.className.substringAfterLast('.')}.${it.methodName}:${it.lineNumber}"
+        }
+        Log.w(LOG_TAG, "Import failed: ${error.javaClass.name} at $frames")
+    }
+
+    private suspend fun checkpointFor(parsed: ParsedFile): ImportUiState.Preview {
+        val database = container.database()
+        val accounts = database.accountDao().all().map { it.toDomain() }
+        val account = accounts.firstOrNull() ?: createHoldingAccount(database)
+
+        return ImportUiState.Preview(
+            fileName = parsed.fileName,
+            formatDescription = parsed.formatDescription,
+            parseResult = parsed.parseResult,
+            account = account,
+            accounts = if (account in accounts) accounts else accounts + account,
+            checkpoint = ImportCheckpointBuilder(database).build(account.id, parsed.parseResult),
+        )
+    }
+
+    /**
+     * The account a first-time user's statement lands in.
+     *
+     * Created up front rather than at import time so the checkpoint has a real
+     * account to fingerprint against, and so "Read as:" names something the user
+     * can then rename or change. It is written to the database immediately
+     * because dedup hashes are keyed by account id, and an id that changed
+     * between the forecast and the write would make the two disagree.
+     */
+    private suspend fun createHoldingAccount(
+        database: dev.financemate.core.data.FinanceMateDatabase,
+    ): Account {
         val account = Account(
             id = AccountId(UUID.randomUUID().toString()),
             displayName = "Imported transactions",
@@ -114,10 +236,10 @@ public class ImportViewModel(
             currency = CurrencyCode.USD,
         )
         database.accountDao().upsert(account.toEntity())
-        return account.id
+        return account
     }
 
-    private suspend fun readAndParse(context: Context, uri: Uri): ImportUiState.Preview =
+    private suspend fun readAndParse(context: Context, uri: Uri): ParsedFile =
         withContext(Dispatchers.IO) {
             val fileName = displayNameOf(context, uri)
             val content = context.contentResolver.openInputStream(uri)
@@ -127,12 +249,19 @@ public class ImportViewModel(
 
             val (parseResult, description) = parse(content, fileName)
 
-            ImportUiState.Preview(
+            ParsedFile(
                 fileName = fileName,
                 formatDescription = description,
                 parseResult = parseResult,
             )
         }
+
+    /** A parsed file, before the ledger has been consulted about it. */
+    private data class ParsedFile(
+        val fileName: String?,
+        val formatDescription: String,
+        val parseResult: ParseResult,
+    )
 
     /**
      * Chooses a parser from the content itself rather than trusting the file
@@ -188,6 +317,9 @@ public class ImportViewModel(
 
     private companion object {
         const val SNIFF_LENGTH = 512
+        const val LOG_TAG = "FinanceMateImport"
+        const val STACK_FRAMES = 8
+        val SUBTITLE_DATE: DateTimeFormatter = DateTimeFormatter.ofPattern("d MMM")
     }
 }
 
@@ -197,10 +329,21 @@ public sealed interface ImportUiState {
 
     public data object Parsing : ImportUiState
 
+    /**
+     * The checkpoint: a file read, understood, and not yet written.
+     *
+     * [checkpoint] is null only while it is being recomputed after an account
+     * change. Holding onto the previous figures during that moment would show
+     * counts belonging to a different account, which is exactly the confusion
+     * changing the account was meant to clear up.
+     */
     public data class Preview(
         val fileName: String?,
         val formatDescription: String,
         val parseResult: ParseResult,
+        val account: Account?,
+        val accounts: List<Account>,
+        val checkpoint: ImportCheckpoint?,
     ) : ImportUiState {
         val rowCount: Int get() = parseResult.transactions.size
         val errorCount: Int
@@ -211,10 +354,25 @@ public sealed interface ImportUiState {
 
     public data object Importing : ImportUiState
 
+    /**
+     * What the import did, plus what the analysis found immediately afterwards.
+     *
+     * The analysis counts are gathered here rather than left for the savings
+     * screen because they are the reason the file was imported at all. A screen
+     * that says only "240 transactions added" has told the user about
+     * bookkeeping; "3 things worth a look" is the promise being kept.
+     */
     public data class Done(
         val imported: Int,
         val duplicates: Int,
         val isLikelyReimport: Boolean,
+        val accountName: String,
+        val batchId: ImportBatchId,
+        /** Date range and skipped rows, when there is anything to say. */
+        val subtitle: String?,
+        val recurringFound: Int,
+        val unnamedMerchants: Int,
+        val worthALook: Int,
     ) : ImportUiState
 
     public data class Failed(val message: String) : ImportUiState

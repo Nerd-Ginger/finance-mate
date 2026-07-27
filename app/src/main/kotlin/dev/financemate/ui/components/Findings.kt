@@ -181,7 +181,7 @@ fun DetailRow(
  * the dashes are what tell the reader a finding is a guess — so it is worth the
  * custom draw.
  */
-private fun Modifier.dashedBorder(colour: Color): Modifier = drawBehind {
+internal fun Modifier.dashedBorder(colour: Color): Modifier = drawBehind {
     val radius = CornerRadius(12.dp.toPx())
     val outline = RoundRect(
         left = 0f,

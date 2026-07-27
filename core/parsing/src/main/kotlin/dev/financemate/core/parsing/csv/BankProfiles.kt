@@ -141,6 +141,18 @@ public object BankProfiles {
     )
 
     /**
+     * Profiles that can be recognised from a header row with no help from the
+     * user.
+     *
+     * Smaller than [ALL], because a profile with an empty signature — Wells
+     * Fargo, whose export has no header row at all — can only be chosen by hand.
+     * The source screen tells the user how many banks are recognised
+     * automatically, and that number is counted from here rather than typed into
+     * the copy, so adding a profile cannot leave the promise stale.
+     */
+    public val AUTO_DETECTED: List<BankProfile> = ALL.filter { it.headerSignature.isNotEmpty() }
+
+    /**
      * Finds the profile whose signature the header row satisfies.
      *
      * Profiles with an empty signature are never matched here — they exist for

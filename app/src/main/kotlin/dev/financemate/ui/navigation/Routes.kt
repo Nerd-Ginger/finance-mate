@@ -40,15 +40,15 @@ object Routes {
     @Serializable
     object Import
 
-    /** Choose where the transactions are coming from. */
+    /**
+     * The whole import flow: source, checkpoint, result.
+     *
+     * One route rather than three. The steps are strictly linear and each
+     * replaces the last, so a back stack would only be a second, weaker copy of
+     * `ImportUiState` — and the two could then disagree, which is how a user
+     * ends up looking at a checkpoint for a file that has already been imported.
+     * `ImportScreen` handles back explicitly instead.
+     */
     @Serializable
     object ImportSource
-
-    /** Review what was parsed before anything is written. */
-    @Serializable
-    object ImportCheckpoint
-
-    /** What changed, with undo. */
-    @Serializable
-    object ImportResult
 }

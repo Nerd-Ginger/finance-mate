@@ -144,6 +144,21 @@ val SectionLabelStyle: TextStyle = TextStyle(
     letterSpacing = 0.14.em,
 )
 
+/**
+ * Mono metadata: file names, row dates, source locations.
+ *
+ * Same family as [SectionLabelStyle] but without the wide tracking, because this
+ * is content to be read rather than a label to be scanned. It marks values that
+ * came out of a file verbatim, so the user can tell them apart from text the app
+ * wrote.
+ */
+val MonoMetaStyle: TextStyle = TextStyle(
+    fontFamily = PlexMono,
+    fontWeight = FontWeight.Normal,
+    fontSize = 12.sp,
+    lineHeight = 16.sp,
+)
+
 /** Anything that touches the network. Always mono. */
 val EgressStyle: TextStyle = TextStyle(
     fontFamily = PlexMono,
