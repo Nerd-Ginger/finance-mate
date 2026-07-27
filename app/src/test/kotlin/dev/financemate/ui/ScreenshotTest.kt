@@ -3,9 +3,12 @@ package dev.financemate.ui
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.test.junit4.createComposeRule
+import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.onRoot
 import com.github.takahirom.roborazzi.captureRoboImage
 import dev.financemate.ui.theme.FinanceMateTheme
@@ -55,7 +58,7 @@ abstract class ScreenshotTest {
                 Box(
                     modifier = Modifier
                         .fillMaxSize()
-                        .background(androidx.compose.material3.MaterialTheme.colorScheme.background),
+                        .background(MaterialTheme.colorScheme.background),
                 ) {
                     content()
                 }
@@ -63,7 +66,31 @@ abstract class ScreenshotTest {
         }
         compose.onRoot().captureRoboImage("src/test/screenshots/$name.png")
     }
+
+    /**
+     * As [capture], but crops to the component rather than the whole window.
+     *
+     * For a single bar or card, a full-screen image is mostly black, and the
+     * thing being reviewed ends up a tenth of the frame. Cropping keeps the
+     * committed image about the component.
+     */
+    protected fun captureComponent(name: String, content: @Composable () -> Unit) {
+        compose.setContent {
+            FinanceMateTheme {
+                Box(
+                    modifier = Modifier
+                        .background(MaterialTheme.colorScheme.background)
+                        .testTag(COMPONENT_TAG),
+                ) {
+                    content()
+                }
+            }
+        }
+        compose.onNodeWithTag(COMPONENT_TAG).captureRoboImage("src/test/screenshots/$name.png")
+    }
 }
+
+private const val COMPONENT_TAG = "screenshot-subject"
 
 /**
  * Pixel 5 proportions — matching the test device, and deliberately smaller than

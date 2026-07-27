@@ -29,33 +29,29 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.navigation.NavDestination
+import androidx.navigation.NavDestination.Companion.hasRoute
+import androidx.navigation.NavDestination.Companion.hierarchy
+import androidx.navigation.NavHostController
+import androidx.navigation.compose.NavHost
+import androidx.navigation.compose.composable
+import androidx.navigation.compose.currentBackStackEntryAsState
+import androidx.navigation.compose.rememberNavController
+import androidx.navigation.navigation
 import dev.financemate.AppContainer
 import dev.financemate.feature.insight.subscription.Subscription
 import dev.financemate.ui.import.ImportScreen
 import dev.financemate.ui.import.ImportViewModel
+import dev.financemate.ui.navigation.Routes
 import dev.financemate.ui.savings.MerchantTagSheet
 import dev.financemate.ui.savings.SavingsScreen
 import dev.financemate.ui.savings.SavingsViewModel
 import dev.financemate.ui.theme.FinanceMate
 import dev.financemate.ui.theme.FinanceMateTheme
-
-/**
- * Where the user can be.
- *
- * **Import is deliberately not here.** It is a task you do occasionally, not a
- * place you return to, and giving it a permanent slot would spend a quarter of
- * the navigation bar on something used once a month. It lives as the orange
- * square instead — one tap away, but not competing with the places.
- *
- * Home, Budget and Accounts are the destinations still to be built; only Savings
- * exists today, so the bar currently shows what is real.
- */
-private enum class Destination(val label: String) {
-    SAVINGS("Savings"),
-}
 
 @Composable
 fun FinanceMateApp(container: AppContainer) {
@@ -67,8 +63,7 @@ fun FinanceMateApp(container: AppContainer) {
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 private fun AppScaffold(container: AppContainer) {
-    var destination by remember { mutableStateOf(Destination.SAVINGS) }
-    var showImport by remember { mutableStateOf(false) }
+    val navController = rememberNavController()
     var taggingSubscription by remember { mutableStateOf<Subscription?>(null) }
 
     val savingsViewModel: SavingsViewModel = viewModel { SavingsViewModel(container) }
@@ -77,14 +72,8 @@ private fun AppScaffold(container: AppContainer) {
     val savingsState by savingsViewModel.state.collectAsStateWithLifecycle()
     val importState by importViewModel.state.collectAsStateWithLifecycle()
 
-    // Re-analyse whenever the savings view is shown, including on returning from
-    // an import. Without this the screen keeps whatever it computed when the
-    // ViewModel was created, so importing a statement and coming back shows the
-    // empty state over a full ledger — the app looking broken at exactly the
-    // moment it should be proving its worth.
-    LaunchedEffect(destination, showImport) {
-        if (!showImport) savingsViewModel.refresh()
-    }
+    val backStackEntry by navController.currentBackStackEntryAsState()
+    val inImportFlow = backStackEntry?.destination?.inGraph<Routes.Import>() == true
 
     Scaffold(
         containerColor = MaterialTheme.colorScheme.background,
@@ -92,7 +81,7 @@ private fun AppScaffold(container: AppContainer) {
             TopAppBar(
                 title = {
                     Text(
-                        text = if (showImport) "Import a statement" else destination.label,
+                        text = if (inImportFlow) "Import a statement" else "Savings",
                         style = MaterialTheme.typography.titleMedium,
                     )
                 },
@@ -104,34 +93,49 @@ private fun AppScaffold(container: AppContainer) {
         },
         bottomBar = {
             BottomBar(
-                current = destination,
-                importActive = showImport,
-                onSelect = {
-                    destination = it
-                    showImport = false
-                },
-                onImport = { showImport = true },
+                importActive = inImportFlow,
+                onSavings = { navController.toSavings() },
+                onImport = { navController.navigate(Routes.Import) },
             )
         },
     ) { innerPadding ->
-        if (showImport) {
-            ImportScreen(
-                state = importState,
-                onFilePicked = { uri -> importViewModel.onFilePicked(container.appContext, uri) },
-                onConfirm = { preview -> importViewModel.confirm(preview) },
-                onReset = { importViewModel.reset() },
-                onDone = {
-                    importViewModel.reset()
-                    showImport = false
-                },
-                modifier = Modifier.padding(innerPadding),
-            )
-        } else {
-            SavingsScreen(
-                state = savingsState,
-                onTagMerchant = { taggingSubscription = it },
-                modifier = Modifier.padding(innerPadding),
-            )
+        NavHost(
+            navController = navController,
+            startDestination = Routes.Main,
+            modifier = Modifier.padding(innerPadding),
+        ) {
+            navigation<Routes.Main>(startDestination = Routes.Savings) {
+                composable<Routes.Savings> {
+                    // Re-analyse each time this becomes current. Without it the
+                    // screen keeps whatever it computed when the ViewModel was
+                    // created, so returning from an import shows the empty state
+                    // over a full ledger.
+                    LaunchedEffect(Unit) { savingsViewModel.refresh() }
+                    SavingsScreen(
+                        state = savingsState,
+                        onTagMerchant = { taggingSubscription = it },
+                    )
+                }
+            }
+
+            // Import is its own graph: a multi-step task with internal back
+            // behaviour, entered and left as a unit rather than a place.
+            navigation<Routes.Import>(startDestination = Routes.ImportSource) {
+                composable<Routes.ImportSource> {
+                    ImportScreen(
+                        state = importState,
+                        onFilePicked = { uri ->
+                            importViewModel.onFilePicked(container.appContext, uri)
+                        },
+                        onConfirm = { preview -> importViewModel.confirm(preview) },
+                        onReset = { importViewModel.reset() },
+                        onDone = {
+                            importViewModel.reset()
+                            navController.toSavings()
+                        },
+                    )
+                }
+            }
         }
     }
 
@@ -152,17 +156,44 @@ private fun AppScaffold(container: AppContainer) {
 }
 
 /**
+ * Returns to savings without stacking duplicates.
+ *
+ * `launchSingleTop` plus popping back to the graph start means repeatedly
+ * finishing imports cannot build a tower of savings screens the user has to
+ * press back through.
+ */
+private fun NavHostController.toSavings() {
+    navigate(Routes.Savings) {
+        popUpTo(Routes.Main) { inclusive = false }
+        launchSingleTop = true
+    }
+}
+
+/**
+ * True when [T] is this destination or any graph containing it.
+ *
+ * The bar needs to know "are we somewhere inside import", not "are we on the
+ * source screen", so it asks about the whole parent chain.
+ */
+private inline fun <reified T : Any> NavDestination.inGraph(): Boolean =
+    hierarchy.any { it.hasRoute<T>() }
+
+/**
  * The navigation bar.
  *
- * The active tab is the only orange text on the bar, and the import square is
- * the only filled orange. That is the whole colour budget for this component —
- * roughly 5% of the screen, spent on where you are and what you can add.
+ * The active tab is the only orange *text*, and the import square the only
+ * filled orange. That is the whole colour budget for this component. The first
+ * version filled the active tab too, which put two solid orange blocks side by
+ * side and made neither of them mean anything — hence the screenshot test.
+ *
+ * Only Savings is shown because only Savings exists. Budget and Accounts appear
+ * as they are built — a dead tab that navigates nowhere is worse than a bar with
+ * one entry.
  */
 @Composable
-private fun BottomBar(
-    current: Destination,
+internal fun BottomBar(
     importActive: Boolean,
-    onSelect: (Destination) -> Unit,
+    onSavings: () -> Unit,
     onImport: () -> Unit,
 ) {
     val colours = FinanceMate.colours
@@ -178,32 +209,29 @@ private fun BottomBar(
     ) {
         Row(
             modifier = Modifier
-                .background(
-                    MaterialTheme.colorScheme.surfaceContainer,
-                    RoundedCornerShape(12.dp),
-                )
+                .background(MaterialTheme.colorScheme.surfaceContainer, RoundedCornerShape(12.dp))
                 .padding(4.dp),
-            horizontalArrangement = Arrangement.spacedBy(4.dp),
         ) {
-            Destination.entries.forEach { entry ->
-                val selected = entry == current && !importActive
-                Text(
-                    text = entry.label,
-                    style = MaterialTheme.typography.labelMedium,
-                    color = if (selected) {
-                        MaterialTheme.colorScheme.onPrimary
-                    } else {
-                        MaterialTheme.colorScheme.onSurfaceVariant
-                    },
-                    modifier = Modifier
-                        .background(
-                            if (selected) colours.foundMoney else androidx.compose.ui.graphics.Color.Transparent,
-                            RoundedCornerShape(999.dp),
-                        )
-                        .clickable { onSelect(entry) }
-                        .padding(horizontal = 18.dp, vertical = 10.dp),
-                )
-            }
+            Text(
+                text = "Savings",
+                style = MaterialTheme.typography.labelMedium,
+                color = if (!importActive) {
+                    colours.foundMoney
+                } else {
+                    MaterialTheme.colorScheme.onSurfaceVariant
+                },
+                modifier = Modifier
+                    .background(
+                        if (!importActive) {
+                            MaterialTheme.colorScheme.surfaceContainerHigh
+                        } else {
+                            Color.Transparent
+                        },
+                        RoundedCornerShape(999.dp),
+                    )
+                    .clickable(onClick = onSavings)
+                    .padding(horizontal = 18.dp, vertical = 10.dp),
+            )
         }
 
         Box(
