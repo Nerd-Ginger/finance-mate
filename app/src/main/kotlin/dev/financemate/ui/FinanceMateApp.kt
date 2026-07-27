@@ -12,6 +12,7 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -53,6 +54,17 @@ private fun AppScaffold(container: AppContainer) {
 
     val savingsState by savingsViewModel.state.collectAsStateWithLifecycle()
     val importState by importViewModel.state.collectAsStateWithLifecycle()
+
+    // Re-analyse whenever the savings tab is shown.
+    //
+    // Without this the screen keeps whatever it computed when the ViewModel was
+    // created, so importing a statement and switching straight to Savings shows
+    // the empty state over a full ledger — the app looking broken at exactly the
+    // moment it should be proving its worth. Analysis is cheap; stale financial
+    // figures are not.
+    LaunchedEffect(destination) {
+        if (destination == Destination.SAVINGS) savingsViewModel.refresh()
+    }
 
     Scaffold(
         topBar = {
